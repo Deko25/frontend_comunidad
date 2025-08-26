@@ -1,0 +1,131 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #e6e0f8;
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+}
+
+.notifications-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    width: 100vw;
+    box-sizing: border-box;
+    padding: 48px 24px 56px;
+    background: linear-gradient(180deg, #9381f1 0%, #a69ae8 100%);
+}
+
+.notifications-title {
+    align-self: flex-center;
+    background: #ffffff;
+    border-radius: 9999px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
+    padding: 12px 44px;
+    font-size: 1.9rem;
+    font-weight: 700;
+    margin-bottom: 36px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #1e1e1e;
+}
+
+.card {
+    position: relative;
+    background-color: #ffffff;
+    border-radius: 44px;
+    padding: 22px 28px;
+    max-width: 760px;
+    width: min(92vw, 760px);
+    display: flex;
+    align-items: center;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
+    margin-bottom: 32px;
+}
+
+.card.left {
+    margin-left: 42px;
+}
+
+.card.right {
+    margin-right: 42px;
+}
+
+.card.right .top {
+    justify-items: right;
+}
+
+.card.left .avatar {
+    left: -50px;
+}
+
+.card.right .avatar {
+    right: -50px;
+}
+
+.avatar {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid #000000;
+    object-fit: cover;
+    background: #fff;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+    z-index: 2;
+}
+
+.info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.card.left .info {
+    padding-left: 36px;
+}
+
+.card.right .info {
+    padding-right: 36px;
+}
+
+.top {
+    flex-direction: row;
+    gap: 10px;
+}
+
+.name {
+    display: flex;
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: #101010;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: #7a7a7a;
+    font-weight: 600;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #ccc;
+    margin: 10px 0;
+}
+
+.comment {
+    font-size: 1rem;
+    color: #333;
+    line-height: 1.5;
+    margin-top: 8px;
+}
