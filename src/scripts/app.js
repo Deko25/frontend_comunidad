@@ -14,6 +14,7 @@ const routes = {
 async function navigate(pathname, addToHistory = true) {
   const route = routes[pathname] || routes["/"];
   const html = await fetch(route).then(res => res.text());
+  
   // Sidebar solo en vistas 3 a 7
   if (["/home","/notifications","/profile","/chats","/settings"].includes(pathname)) {
     const sidebar = await fetch("/src/components/sidebar.html").then(res => res.text());

@@ -1,160 +1,428 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    font-family: 'Arial', sans-serif;
-    background: #C6BFFF;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #c8b5ff 0%, #b8a5ff 100%);
+  min-height: 100vh;
+  padding: 20px;
 }
 
+.container {
+  display: grid;
+  grid-template-columns: 280px 1fr 300px;
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  height: calc(100vh - 40px);
+}
+
+/* Left Sidebar */
 .sidebar {
-    width: 270px;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    padding: 25px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
-    display: flex;
-    flex-direction: column;
-    height: 600px;
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
-/* Perfil de usuario */
 .user-profile {
-    display: flex;
-    align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
 }
 
 .user-avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    overflow: hidden;
-    margin-right: 15px;
-    border: 3px solid #8b5cf6;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 15px;
 }
 
 .user-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .user-info h3 {
-    font-size: 16px;
-    font-weight: bold;
-    color: #1f2937;
-    margin-bottom: 2px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
 }
 
 .user-info p {
-    font-size: 14px;
-    color: #6b7280;
+  font-size: 14px;
+  color: #666;
 }
 
-/* Menú de navegación */
 .nav-menu {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .nav-item {
-    display: flex;
-    align-items: center;
-    padding: 15px 20px;
-    border-radius: 15px;
-    text-decoration: none;
-    color: #374151;
-    font-weight: 500;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    position: relative;
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  border-radius: 15px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.3s ease;
 }
 
 .nav-item:hover {
-    background: rgba(139, 92, 246, 0.1);
-    transform: translateX(5px);
+  background-color: #705fff;
+  color: white;
 }
 
 .nav-item.active {
-    background: linear-gradient(135deg, #8b5cf6, #6366f1);
-    color: white;
-    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+  background-color: #705fff;
+  color: white;
 }
 
 .nav-icon {
-    font-size: 18px;
-    margin-right: 15px;
-    width: 20px;
-    text-align: center;
+  margin-right: 15px;
+  font-size: 18px;
 }
 
-.nav-text {
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
-
-/* Logo Riwi */
-.riwi-logo {
-    margin: 20px 0;
-    text-align: center;
-}
-
-.riwi-logo img {
-    width: 270px;
-    height: auto;
-    opacity: 0.8;
-}
-
-/* Botón cerrar sesión */
 .logout-btn {
-    background: linear-gradient(135deg, #8b5cf6, #6366f1);
-    color: white;
-    border: none;
-    padding: 15px 25px;
-    border-radius: 15px;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    letter-spacing: 0.5px;
-    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+  background: #705fff;
+  color: white;
+  border: none;
+  padding: 15px 20px;
+  border-radius: 15px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  margin: 20px 0;
+  transition: all 0.3s ease;
 }
 
 .logout-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 25px rgba(139, 92, 246, 0.4);
+  background: #5a4bcc;
 }
 
-.logout-btn:active {
-    transform: translateY(0);
+.riwi-logo {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.riwi-logo img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Main Content */
+.main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+.post-creator {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.post-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 15px;
+}
+
+.post-input {
+  flex: 1;
+}
+
+.post-text-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: #999;
+  background: transparent;
+}
+
+.post-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.post-action-btn {
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.post-action-btn:hover {
+  background: #f5f5f5;
+}
+
+.post-btn {
+  background: #333;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.posts-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.post {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.post .post-header {
+  margin-bottom: 15px;
+}
+
+.post-info h4 {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.post-time {
+  font-size: 12px;
+  color: #666;
+}
+
+.post-content p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.post-image {
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.post-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Right Sidebar */
+.right-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.top-section {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.search-icon {
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.riwi-icons {
+  display: flex;
+  gap: 10px;
+}
+
+.riwi-icon {
+  background: #f0f0f0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Added scrollable container for news and communities sections with hidden scrollbar */
+.scrollable-content {
+  max-height: calc(100vh - 145px);
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.scrollable-content::-webkit-scrollbar {
+  display: none; /* WebKit */
+}
+
+.riwi-news {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.news-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.news-image {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.news-content p {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.read-more-btn {
+  background: #333;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+.communities {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.communities h3 {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.community-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.community-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.community-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+  font-size: 14px;
+  overflow: hidden;
+}
+
+.community-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.community-icon.gosling {
+  background: #00add8;
+}
+
+.community-icon.hopper {
+  background: #663399;
+}
+
+.community-icon.linus {
+  background: #000;
+}
+
+.community-icon.lovelace {
+  background: #ff6b35;
+}
+
+.community-item span {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
 }
 
 /* Responsive */
-@media (max-width: 768px) {
-    .sidebar {
-        width: 280px;
-        height: auto;
-        min-height: 500px;
-    }
-    .nav-text {
-        font-size: 13px;
-    }
-    .user-info h3 {
-        font-size: 15px;
-    }
+@media (max-width: 1200px) {
+  .container {
+    grid-template-columns: 250px 1fr 280px;
+  }
 }
 
+@media (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
 
+  .sidebar {
+    order: 3;
+  }
+
+  .right-sidebar {
+    order: 2;
+  }
+
+  .main-content {
+    order: 1;
+  }
+}
