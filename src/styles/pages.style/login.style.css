@@ -15,6 +15,7 @@ body {
   display: flex;
   height: 100vh;
   gap: 50px;
+  background-color: #fdfdfd;
 }
 
 .left-section {
@@ -40,7 +41,7 @@ body {
 
 .right-section {
   flex: 1;
-  background: white;
+  background: #fdfdfd;
   display: flex;
   align-items: center;
   justify-content: center;

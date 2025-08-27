@@ -1,94 +1,114 @@
+import { jwtDecode } from 'jwt-decode';
 import { setupLoginForm, setupRegisterForm } from './form-logic.js';
 
 const routes = {
   "/": "/src/pages/login.page.html",
   "/login": "/src/pages/login.page.html",
   "/register": "/src/pages/register.page.html",
-  // ... agrega el resto de tus rutas aquí
-  "/home": "/src/pages/home.page.html"
+  "/home": "/src/pages/home.page.html",
+  "/profile-setup": "/src/pages/profile.page.html"
 };
 
-const protectedRoutes = ["/home", "/notifications", "/profile", "/chats", "/settings"];
+const protectedRoutes = ["/home", "/notifications", "/profile", "/chats", "/settings", "/profile-setup"];
 
 async function navigate(pathname, addToHistory = true) {
-  const token = localStorage.getItem('token');
-  // Solo es autenticado si el token existe, no está vacío y no es 'null'
-  const isAuthenticated = token && token !== '' && token !== 'null';
+    const token = localStorage.getItem('token');
+    let isAuthenticated = false;
 
-  // 1. Si la ruta es protegida y el usuario NO está autenticado, redirigir a login
-  if (protectedRoutes.includes(pathname) && !isAuthenticated) {
-    console.warn('Acceso denegado. Redirigiendo a login.');
-    return navigate('/login');
-  }
-
-  // 2. Si el usuario está autenticado y trata de ir a login, register o raíz, redirigir a home
-  if (isAuthenticated && (pathname === '/login' || pathname === '/register' || pathname === '/')) {
-    return navigate('/home');
-  }
-
-  const route = routes[pathname] || routes["/"];
-  try {
-    const html = await fetch(route).then(res => res.text());
-    
-    // Inyecta el HTML en el contenedor principal
-    document.getElementById("app").innerHTML = html;
-
-    // Cargar el sidebar solo en las rutas específicas
-    const sidebarRoutes = ["/home", "/notifications", "/profile", "/settings", "/chats"];
-    if (sidebarRoutes.includes(pathname)) {
-      try {
-        const sidebarHtml = await fetch("/src/components/sidebar.html").then(res => res.text());
-        // Si usas el grid .container, inserta el sidebar antes del main-content
-        const appContainer = document.getElementById("app");
-        // Crear un contenedor si no existe
-        let container = appContainer.querySelector('.container');
-        if (!container) {
-          container = document.createElement('div');
-          container.className = 'container';
-          // Mover el contenido actual al container
-          while (appContainer.firstChild) {
-            container.appendChild(appContainer.firstChild);
-          }
-          appContainer.appendChild(container);
+    // First, validate the token
+    if (token) {
+        try {
+            const decodedToken = jwtDecode(token);
+            if (decodedToken.exp * 1000 > Date.now()) {
+                isAuthenticated = true;
+            } else {
+                localStorage.removeItem('token');
+                localStorage.removeItem('profileExists');
+            }
+        } catch (error) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('profileExists');
         }
-        // Insertar el sidebar al inicio del container si no existe
-        if (!container.querySelector('.sidebar')) {
-          container.insertAdjacentHTML('afterbegin', sidebarHtml);
+    }
+
+    const profileExists = localStorage.getItem('profileExists') === 'true';
+
+    // Handle user status based on authentication and profile existence
+    if (isAuthenticated) {
+        // If authenticated but profile doesn't exist, redirect to profile setup
+        // if (!profileExists && pathname !== '/profile-setup') {
+        //     return navigate('/profile-setup');
+        // }
+
+        // If authenticated and trying to access a public page, redirect to home
+        if ((pathname === '/login' || pathname === '/register' || pathname === '/')) {
+            return navigate('/home');
         }
-      } catch (err) {
-        console.error('Error al cargar el sidebar:', err);
-      }
+
+    } else { // User is NOT authenticated
+        // If they try to access a protected route, redirect them to login
+        if (protectedRoutes.includes(pathname)) {
+            return navigate('/login');
+        }
     }
 
-    if (addToHistory) {
-      history.pushState({}, "", pathname);
-    }
-    
-    // Ejecutar la lógica de la página después de inyectar el HTML
-    runPageScripts(pathname);
+    // If no redirection is needed, load the page
+    const route = routes[pathname] || routes["/"];
+    try {
+        const html = await fetch(route).then(res => res.text());
+        
+        document.getElementById("app").innerHTML = html;
 
-    // Agregar funcionalidad al botón de cerrar sesión si existe
-    const logoutBtn = document.querySelector('.logout-btn');
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', () => {
-        localStorage.removeItem('token');
-        navigate('/login');
-      });
-    }
+        const sidebarRoutes = ["/home", "/notifications", "/profile", "/settings", "/chats", "/profile-setup"];
+        if (sidebarRoutes.includes(pathname)) {
+            try {
+                const sidebarHtml = await fetch("/src/components/sidebar.html").then(res => res.text());
+                const appContainer = document.getElementById("app");
+                let container = appContainer.querySelector('.container');
+                if (!container) {
+                    container = document.createElement('div');
+                    container.className = 'container';
+                    while (appContainer.firstChild) {
+                        container.appendChild(appContainer.firstChild);
+                    }
+                    appContainer.appendChild(container);
+                }
+                if (!container.querySelector('.sidebar')) {
+                    container.insertAdjacentHTML('afterbegin', sidebarHtml);
+                }
+            } catch (err) {
+                console.error('Error loading sidebar:', err);
+            }
+        }
 
-  } catch (error) {
-    console.error('Error al cargar la página:', error);
-  }
+        const logoutBtn = document.querySelector('.logout-btn');
+          if (logoutBtn) {
+              logoutBtn.addEventListener('click', () => {
+                  localStorage.removeItem('token');
+                  localStorage.removeItem('profileExists');
+                  navigate('/login');
+          });
+        }
+
+        if (addToHistory) {
+            history.pushState({}, "", pathname);
+        }
+        
+        runPageScripts(pathname);
+
+    } catch (error) {
+        console.error('Error al cargar la página:', error);
+    }
 }
 
-// Esta función se encarga de ejecutar la lógica específica de cada página
 function runPageScripts(pathname) {
   if (pathname === '/login' || pathname === '/') {
     setupLoginForm(navigate);
   } else if (pathname === '/register') {
     setupRegisterForm(navigate);
+  } else if (pathname === '/home') {
+    // You may have other functions here
   }
-  // Puedes agregar más else if para otras páginas
 }
 
 document.body.addEventListener("click", (e) => {
@@ -104,10 +124,8 @@ window.addEventListener("popstate", () => {
   navigate(location.pathname, false);
 });
 
-// Inicialización de la SPA al cargar la página
 document.addEventListener("DOMContentLoaded", () => {
   navigate(location.pathname, false);
 });
 
-// Exporta la función navigate para que otros módulos la puedan usar
 export { navigate };

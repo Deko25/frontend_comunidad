@@ -1,4 +1,5 @@
 // src/scripts/form-logic.js
+import axios from 'axios';
 import { login, register } from '../services/auth.js';
 
 // Nuevo servicio para obtener los roles
@@ -16,10 +17,13 @@ async function getRoles() {
 // Función para llenar el select de roles dinámicamente
 async function fetchAndPopulateRoles() {
     const roleSelect = document.getElementById('role-select');
-    if (!roleSelect) return;
+    if (!roleSelect) {
+        console.error('Elemento con ID "role-select" no encontrado.');
+        return;
+    }
 
     try {
-        const roles = await getRoles(); // Llamamos al nuevo servicio
+        const roles = await getRoles();
         
         // Limpiamos las opciones existentes
         roleSelect.innerHTML = '';
@@ -45,6 +49,7 @@ async function fetchAndPopulateRoles() {
         roleSelect.innerHTML = '<option value="">Error al cargar roles</option>';
     }
 }
+
 
 export function setupLoginForm(navigate) {
     const form = document.querySelector('.login-form');
@@ -77,7 +82,7 @@ export function setupRegisterForm(navigate) {
     const form = document.querySelector('.registration-form');
     if (!form) return;
     
-    // 1. Llamamos a la función para llenar el select de roles
+    // Llamamos a la función para llenar el select de roles
     fetchAndPopulateRoles();
     
     form.onsubmit = async (e) => {
@@ -90,16 +95,15 @@ export function setupRegisterForm(navigate) {
         }
 
         const userData = {
-            // Corregimos los nombres de los campos para que coincidan con el HTML
             first_name: form['first-name'].value,
             last_name: form['last-name'].value,
             email: form['email'].value,
             password: form['password'].value,
-            role_id: roleId // Enviamos el ID del rol seleccionado
+            role_id: roleId
         };
         
         try {
-            const res = await register(userData);
+            await register(userData);
             navigate('/login');
             alert('¡Registro exitoso! Por favor, inicia sesión.');
         } catch (err) {
