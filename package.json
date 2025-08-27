@@ -1,0 +1,56 @@
+{
+  "name": "frontend_comunidad",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "asynckit": "^0.4.0",
+    "axios": "^1.11.0",
+    "call-bind-apply-helpers": "^1.0.2",
+    "combined-stream": "^1.0.8",
+    "delayed-stream": "^1.0.0",
+    "dunder-proto": "^1.0.1",
+    "es-define-property": "^1.0.1",
+    "es-errors": "^1.3.0",
+    "es-object-atoms": "^1.1.1",
+    "es-set-tostringtag": "^2.1.0",
+    "esbuild": "^0.25.9",
+    "fdir": "^6.5.0",
+    "follow-redirects": "^1.15.11",
+    "form-data": "^4.0.4",
+    "function-bind": "^1.1.2",
+    "get-intrinsic": "^1.3.0",
+    "get-proto": "^1.0.1",
+    "gopd": "^1.2.0",
+    "has-symbols": "^1.1.0",
+    "has-tostringtag": "^1.0.2",
+    "hasown": "^2.0.2",
+    "math-intrinsics": "^1.1.0",
+    "mime-db": "^1.52.0",
+    "mime-types": "^2.1.35",
+    "nanoid": "^3.3.11",
+    "picocolors": "^1.1.1",
+    "picomatch": "^4.0.3",
+    "postcss": "^8.5.6",
+    "proxy-from-env": "^1.1.0",
+    "rollup": "^4.48.1",
+    "source-map-js": "^1.2.1",
+    "tinyglobby": "^0.2.14",
+    "vite": "^7.1.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev":"vite"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Deko25/frontend_comunidad.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Deko25/frontend_comunidad/issues"
+  },
+  "homepage": "https://github.com/Deko25/frontend_comunidad#readme",
+  "description": ""
+}
