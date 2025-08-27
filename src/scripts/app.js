@@ -1,47 +1,70 @@
-import{setupLoginForm, setupRegisterForm} from "./views-controller.js"
+import { setupLoginForm, setupRegisterForm } from './form-logic.js';
 
-// Rutas para las 7 vistas
-export const routes = {
-  "/": "./src/pages/login.page.html",
-  "/login": "./src/pages/login.page.html",
-  "/register": "./src/pages/register.page.html",
-  "/home": "./src/pages/home.page.html",
-  "/notifications": "./src/pages/notifications.page.html",
-  "/profile": "./src/pages/profile.page.html",
-  "/chats": "./src/pages/chats.page.html",
-  "/settings": "./src/pages/settings.page.html"
+const routes = {
+  "/": "/src/pages/login.page.html",
+  "/login": "/src/pages/login.page.html",
+  "/register": "/src/pages/register.page.html",
+  // ... agrega el resto de tus rutas aquí
+  "/home": "/src/pages/home.page.html"
 };
-export async function navigate(pathname, addToHistory = true) {
-  const route = routes[pathname] || routes['/'];
-  const html = await fetch(route).then(res => res.text());
 
-  if (["/home","/notifications","/profile","/chats","/settings"].includes(pathname)) {
-    const sidebar = await fetch('./src/components/sidebar.html').then(res => res.text());
-    document.getElementById('app').innerHTML = sidebar + html;
-  } else {
-    document.getElementById('app').innerHTML = html;
+const protectedRoutes = ["/home", "/notifications", "/profile", "/chats", "/settings"];
+
+async function navigate(pathname, addToHistory = true) {
+  const token = localStorage.getItem('token');
+  const isAuthenticated = token !== null;
+
+  if (protectedRoutes.includes(pathname) && !isAuthenticated) {
+    console.warn('Acceso denegado. Redirigiendo a login.');
+    return navigate('/login');
   }
 
-  if (addToHistory) {
-    history.pushState({}, '', pathname);
-  }
+  const route = routes[pathname] || routes["/"];
+  try {
+    const html = await fetch(route).then(res => res.text());
+    
+    // Inyecta el HTML en el contenedor principal
+    document.getElementById("app").innerHTML = html;
 
-if (pathname === "/login" || pathname === "/") setupLoginForm();
-if (pathname === "/register") setupRegisterForm();
+    if (addToHistory) {
+      history.pushState({}, "", pathname);
+    }
+    
+    // Ejecutar la lógica de la página después de inyectar el HTML
+    runPageScripts(pathname);
+
+  } catch (error) {
+    console.error('Error al cargar la página:', error);
+  }
 }
 
-window.addEventListener('popstate', () => {
-  navigate(location.pathname, false);
-});
+// Esta función se encarga de ejecutar la lógica específica de cada página
+function runPageScripts(pathname) {
+  if (pathname === '/login' || pathname === '/') {
+    setupLoginForm(navigate);
+  } else if (pathname === '/register') {
+    setupRegisterForm(navigate);
+  }
+  // Puedes agregar más `else if` para otras páginas
+}
 
-document.body.addEventListener('click', (e) => {
-  const link = e.target.closest('[data-link]');
+document.body.addEventListener("click", (e) => {
+  const link = e.target.closest("[data-link]");
   if (link) {
     e.preventDefault();
-    const path = link.getAttribute('href');
+    const path = link.getAttribute("href");
     navigate(path);
   }
 });
 
-// Inicialización
-navigate(location.pathname, false);
+window.addEventListener("popstate", () => {
+  navigate(location.pathname, false);
+});
+
+// Inicialización de la SPA al cargar la página
+document.addEventListener("DOMContentLoaded", () => {
+  navigate(location.pathname, false);
+});
+
+// Exporta la función navigate para que otros módulos la puedan usar
+export { navigate };
