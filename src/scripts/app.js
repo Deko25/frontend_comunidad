@@ -12,11 +12,18 @@ const protectedRoutes = ["/home", "/notifications", "/profile", "/chats", "/sett
 
 async function navigate(pathname, addToHistory = true) {
   const token = localStorage.getItem('token');
-  const isAuthenticated = token !== null;
+  // Solo es autenticado si el token existe, no está vacío y no es 'null'
+  const isAuthenticated = token && token !== '' && token !== 'null';
 
+  // 1. Si la ruta es protegida y el usuario NO está autenticado, redirigir a login
   if (protectedRoutes.includes(pathname) && !isAuthenticated) {
     console.warn('Acceso denegado. Redirigiendo a login.');
     return navigate('/login');
+  }
+
+  // 2. Si el usuario está autenticado y trata de ir a login, register o raíz, redirigir a home
+  if (isAuthenticated && (pathname === '/login' || pathname === '/register' || pathname === '/')) {
+    return navigate('/home');
   }
 
   const route = routes[pathname] || routes["/"];
@@ -27,7 +34,7 @@ async function navigate(pathname, addToHistory = true) {
     document.getElementById("app").innerHTML = html;
 
     // Cargar el sidebar solo en las rutas específicas
-    const sidebarRoutes = ["/home", "/notifications", "/profile", "/settings"];
+    const sidebarRoutes = ["/home", "/notifications", "/profile", "/settings", "/chats"];
     if (sidebarRoutes.includes(pathname)) {
       try {
         const sidebarHtml = await fetch("/src/components/sidebar.html").then(res => res.text());
@@ -59,6 +66,15 @@ async function navigate(pathname, addToHistory = true) {
     
     // Ejecutar la lógica de la página después de inyectar el HTML
     runPageScripts(pathname);
+
+    // Agregar funcionalidad al botón de cerrar sesión si existe
+    const logoutBtn = document.querySelector('.logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('token');
+        navigate('/login');
+      });
+    }
 
   } catch (error) {
     console.error('Error al cargar la página:', error);
