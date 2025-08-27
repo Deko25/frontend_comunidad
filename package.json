@@ -24,6 +24,7 @@
     "has-symbols": "^1.1.0",
     "has-tostringtag": "^1.0.2",
     "hasown": "^2.0.2",
+    "jwt-decode": "^4.0.0",
     "math-intrinsics": "^1.1.0",
     "mime-db": "^1.52.0",
     "mime-types": "^2.1.35",

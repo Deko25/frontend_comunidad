@@ -1,128 +1,97 @@
 <link rel="stylesheet" href="./src/styles/global.style.css">
         <!-- Main Content -->
-        <div class="main-content">
-            <!-- Post Creation -->
-            <div class="post-creator">
-                <div class="post-header">
-                    <img src="./src/images/jefferson.png" alt="User Avatar" class="post-avatar">
-                    <div class="post-input">
-                        <input type="text" placeholder="Share your dev insights" class="post-text-input">
-                    </div>
-                </div>
-                <div class="post-actions">
-                    <button class="post-action-btn">
-                        <span>{ }</span> code
-                    </button>
-                    <button class="post-action-btn">
-                        <span>🖼️</span> Images
-                    </button>
-                    <button class="post-action-btn">
-                        <span>📎</span> files
-                    </button>
-                    <button class="post-action-btn">
-                        <span>🌐</span> Public
-                    </button>
-                    <button class="post-btn">POST</button>
+<div class="container">
+    <div class="main-content">
+        <div class="post-creator">
+            <div class="post-header">
+                <img src="assets/default-user.png" alt="User Avatar" class="post-avatar">
+
+                <div class="post-input">
+                    <textarea id="postText" placeholder="Share your dev insights" class="post-text-input"></textarea>
                 </div>
             </div>
 
-            <!-- Posts Feed -->
-            <div class="posts-feed">
-                <!-- Post 1 -->
-                <div class="post">
-                    <div class="post-header">
-                        <img src="./src/images/karlos.png" alt="Karlos Cajiboy" class="post-avatar">
-                        <div class="post-info">
-                            <h4>Karlos Cajiboy</h4>
-                            <span class="post-time">3 hours ago</span>
-                        </div>
-                    </div>
-                    <div class="post-content">
-                        <p>just deployed my first micro-services architecture using Docker and kubernetes! The learning curve was steep but totally worth it. Here's my setup and some key insights I learned along the way.</p>
-                        <div class="post-image">
-                            <img src="" alt="Coding Setup">
-                        </div>
-                    </div>
-                </div>
+            <div id="preview-area" class="preview-area"></div>
 
-                <!-- Post 2 -->
-                <div class="post">
-                    <div class="post-header">
-                        <img src="./src/images/zamir.png" alt="Zamir Estrada" class="post-avatar">
-                        <div class="post-info">
-                            <h4>Zamir Estrada</h4>
-                            <span class="post-time">5 hours ago</span>
-                        </div>
-                    </div>
-                    <div class="post-content">
-                        <p>"Software is not just code, it's the engine that drives innovation. From automating tasks to building smarter solutions, software development is shaping the future. What do you think is the next big step in the software world?"</p>
-                        <div class="post-image">
-                            <img src="/placeholder.svg?height=300&width=500" alt="Development Workspace">
-                        </div>
-                    </div>
-                </div>
+            <div class="post-actions">
+                <label class="post-action-btn">
+                    <input type="file" id="codeInput" accept=".js,.py,.java,.cpp,.txt" hidden>
+                    <span>{ }</span> Code
+                </label>
+                <label class="post-action-btn">
+                    <input type="file" id="imageInput" accept="image/*" hidden>
+                    <span>🖼️</span> Images
+                </label>
+                <label class="post-action-btn">
+                    <input type="file" id="fileInput" hidden>
+                    <span>📎</span> Files
+                </label>
+
+                <select id="privacy" class="post-action-btn privacy-select">
+                    <option value="Public">🌍 Public</option>
+                    <option value="Friends">👥 Friends</option>
+                    <option value="Only Me">🔒 Only Me</option>
+                </select>
+
+                <button class="post-btn" id="postBtn">POST</button>
             </div>
         </div>
 
-        <!-- Right Sidebar -->
-        <div class="right-sidebar">
-            <!-- Search and Riwi Icons -->
-            <div class="top-section">
-                <div class="search-icon">🔍</div>
-                <div class="riwi-icons">
-                    <div class="riwi-icon">Riwi</div>
-                    <div class="riwi-icon">Riwi Talent</div>
+        <div class="feed" id="feed">
+            </div>
+
+    </div>
+
+    <div class="right-sidebar">
+        <div class="top-section">
+            <div class="search-icon">🔍</div>
+            <div class="riwi-icons">
+                <div class="riwi-icon">Riwi</div>
+                <div class="riwi-icon">Riwi Talent</div>
+            </div>
+        </div>
+
+        <div class="scrollable-content">
+            <div class="riwi-news">
+                <h3>RIWI NEWS</h3>
+                <div class="news-item">
+                    <img src="./src/images/news.png" alt="AI News" class="news-image">
+                    <div class="news-content">
+                        <p>🤖 Artificial Intelligence is transforming studying by providing personalized support and making learning more efficient.</p>
+                        <button class="read-more-btn">LEER MAS</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Wrapped RIWI NEWS and COMUNIDADES in scrollable container with hidden scrollbar -->
-            <div class="scrollable-content">
-                <!-- Riwi News -->
-                <div class="riwi-news">
-                    <h3>RIWI NEWS</h3>
-                    <div class="news-item">
-                        <img src="./src/images/news.png" alt="AI News" class="news-image">
-                        <div class="news-content">
-                            <p>🤖 Artificial Intelligence is transforming studying by providing personalized support and making learning more efficient.</p>
-                            <button class="read-more-btn">LEER MAS</button>
+            <div class="communities">
+                <h3>COMUNIDADES</h3>
+                <div class="community-list">
+                    <div class="community-item">
+                        <div class="community-icon gosling">
+                            <img src="./src/images/gosling.png" alt="Go Gopher">
                         </div>
+                        <span>GOSLING</span>
                     </div>
-                </div>
-
-                <!-- Communities -->
-                <div class="communities">
-                    <h3>COMUNIDADES</h3>
-                    <div class="community-list">
-                        <div class="community-item">
-                            <!-- replaced text icon with actual image for Gosling community -->
-                            <div class="community-icon gosling">
-                                <img src="./src/images/gosling.png" alt="Go Gopher">
-                            </div>
-                            <span>GOSLING</span>
+                    <div class="community-item">
+                        <div class="community-icon hopper">
+                            <img src="./src/images/hopper.png" alt="Grace Hopper">
                         </div>
-                        <div class="community-item">
-                            <!-- replaced text icon with actual image for Hopper community -->
-                            <div class="community-icon hopper">
-                                <img src="./src/images/hopper.png" alt="Grace Hopper">
-                            </div>
-                            <span>HOPPER</span>
+                        <span>HOPPER</span>
+                    </div>
+                    <div class="community-item">
+                        <div class="community-icon linus">
+                            <img src="./src/images/linus.png" alt="Linux Tux">
                         </div>
-                        <div class="community-item">
-                            <!-- replaced text icon with actual image for Linus community -->
-                            <div class="community-icon linus">
-                                <img src="./src/images/linus.png" alt="Linux Tux">
-                            </div>
-                            <span>LINUS</span>
+                        <span>LINUS</span>
+                    </div>
+                    <div class="community-item">
+                        <div class="community-icon lovelace">
+                            <img src="./src/images/lovelace.png" alt="Ada Lovelace">
                         </div>
-                        <div class="community-item">
-                            <!-- replaced text icon with actual image for Lovelace community -->
-                            <div class="community-icon lovelace">
-                                <img src="./src/images/lovelace.png" alt="Ada Lovelace">
-                            </div>
-                            <span>LOVELACE</span>
-                        </div>
+                        <span>LOVELACE</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
