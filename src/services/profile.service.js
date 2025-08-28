@@ -31,7 +31,23 @@ export const checkProfileStatus = async () => {
         });
         return response.data.profileExists;
     } catch (error) {
-        console.error("Error checking profile status:", error);
         return false;
+    }
+};
+
+export const getProfileData = async () => { // <-- Agrega esta nueva función
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Authentication token not found');
+
+    try {
+        const response = await axios.get(`${API_URL}/api/profile`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching profile data:", error);
+        throw error;
     }
 };
