@@ -1,5 +1,8 @@
 import { jwtDecode } from 'jwt-decode';
-import { setupLoginForm, setupRegisterForm } from './form-logic.js';
+import { setupLoginForm, setupRegisterForm, setupProfileForm } from './form-logic.js';
+import { checkProfileStatus } from '../services/profile.service.js';
+import { setupPostPage } from './post.js'; 
+
 
 const routes = {
   "/": "/src/pages/login.page.html",
@@ -15,7 +18,6 @@ async function navigate(pathname, addToHistory = true) {
     const token = localStorage.getItem('token');
     let isAuthenticated = false;
 
-    // First, validate the token
     if (token) {
         try {
             const decodedToken = jwtDecode(token);
@@ -31,28 +33,24 @@ async function navigate(pathname, addToHistory = true) {
         }
     }
 
-    const profileExists = localStorage.getItem('profileExists') === 'true';
-
-    // Handle user status based on authentication and profile existence
     if (isAuthenticated) {
-        // If authenticated but profile doesn't exist, redirect to profile setup
+        // Get the profile status from the backend
+        const profileExists = await checkProfileStatus();
+
         if (!profileExists && pathname !== '/profile-setup') {
             return navigate('/profile-setup');
         }
 
-        // If authenticated and trying to access a public page, redirect to home
         if ((pathname === '/login' || pathname === '/register' || pathname === '/')) {
             return navigate('/home');
         }
 
-    } else { // User is NOT authenticated
-        // If they try to access a protected route, redirect them to login
+    } else {
         if (protectedRoutes.includes(pathname)) {
             return navigate('/login');
         }
     }
 
-    // If no redirection is needed, load the page
     const route = routes[pathname] || routes["/"];
     try {
         const html = await fetch(route).then(res => res.text());
@@ -107,9 +105,11 @@ function runPageScripts(pathname) {
   } else if (pathname === '/register') {
     setupRegisterForm(navigate);
   } else if (pathname === '/home') {
-    // You may have other functions here
+    setupPostPage(navigate);
+  } else if (pathname === '/profile-setup') {
+    setupProfileForm(navigate);
   }
-}
+};
 
 document.body.addEventListener("click", (e) => {
   const link = e.target.closest("[data-link]");
