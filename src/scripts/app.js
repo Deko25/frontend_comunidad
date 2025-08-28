@@ -6,7 +6,7 @@ const routes = {
   "/login": "/src/pages/login.page.html",
   "/register": "/src/pages/register.page.html",
   "/home": "/src/pages/home.page.html",
-  "/profile-setup": "/src/pages/profile.page.html"
+  "/profile-setup": "/src/pages/profile-setup.page.html"
 };
 
 const protectedRoutes = ["/home", "/notifications", "/profile", "/chats", "/settings", "/profile-setup"];
@@ -36,9 +36,9 @@ async function navigate(pathname, addToHistory = true) {
     // Handle user status based on authentication and profile existence
     if (isAuthenticated) {
         // If authenticated but profile doesn't exist, redirect to profile setup
-        // if (!profileExists && pathname !== '/profile-setup') {
-        //     return navigate('/profile-setup');
-        // }
+        if (!profileExists && pathname !== '/profile-setup') {
+            return navigate('/profile-setup');
+        }
 
         // If authenticated and trying to access a public page, redirect to home
         if ((pathname === '/login' || pathname === '/register' || pathname === '/')) {
@@ -59,7 +59,7 @@ async function navigate(pathname, addToHistory = true) {
         
         document.getElementById("app").innerHTML = html;
 
-        const sidebarRoutes = ["/home", "/notifications", "/profile", "/settings", "/chats", "/profile-setup"];
+        const sidebarRoutes = ["/home", "/notifications", "/profile", "/settings", "/chats"];
         if (sidebarRoutes.includes(pathname)) {
             try {
                 const sidebarHtml = await fetch("/src/components/sidebar.html").then(res => res.text());
