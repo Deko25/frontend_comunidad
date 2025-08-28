@@ -1,8 +1,7 @@
 import { jwtDecode } from 'jwt-decode';
 import { setupLoginForm, setupRegisterForm, setupProfileForm } from './form-logic.js';
-import { checkProfileStatus } from '../services/profile.service.js';
-import { setupPostPage } from './post.js'; 
-
+import { checkProfileStatus, getProfileData } from '../services/profile.service.js'; // Importa getProfileData
+import { setupPostPage } from './post.js';
 
 const routes = {
   "/": "/src/pages/login.page.html",
@@ -13,6 +12,25 @@ const routes = {
 };
 
 const protectedRoutes = ["/home", "/notifications", "/profile", "/chats", "/settings", "/profile-setup"];
+
+// Función para actualizar el sidebar con los datos del perfil
+async function updateSidebar() {
+    try {
+        const profile = await getProfileData();
+        const userImage = document.querySelector('.user-avatar img');
+        const userName = document.querySelector('.user-info h3');
+        const userEmail = document.querySelector('.user-info p');
+        const API_URL = 'http://localhost:3000/';
+
+        if (userImage && userName && userEmail) {
+            userImage.src = profile.profile_photo ? `${API_URL}${profile.profile_photo}` : './src/images/default-avatar.png'; // Usa una imagen por defecto
+            userName.textContent = `${profile.User.first_name} ${profile.User.last_name}`;
+            userEmail.textContent = profile.User.email;
+        }
+    } catch (error) {
+        console.error('Failed to update sidebar with profile data:', error);
+    }
+}
 
 async function navigate(pathname, addToHistory = true) {
     const token = localStorage.getItem('token');
@@ -34,7 +52,6 @@ async function navigate(pathname, addToHistory = true) {
     }
 
     if (isAuthenticated) {
-        // Get the profile status from the backend
         const profileExists = await checkProfileStatus();
 
         if (!profileExists && pathname !== '/profile-setup') {
@@ -54,7 +71,7 @@ async function navigate(pathname, addToHistory = true) {
     const route = routes[pathname] || routes["/"];
     try {
         const html = await fetch(route).then(res => res.text());
-        
+
         document.getElementById("app").innerHTML = html;
 
         const sidebarRoutes = ["/home", "/notifications", "/profile", "/settings", "/chats"];
@@ -74,6 +91,7 @@ async function navigate(pathname, addToHistory = true) {
                 if (!container.querySelector('.sidebar')) {
                     container.insertAdjacentHTML('afterbegin', sidebarHtml);
                 }
+                updateSidebar(); // <-- Llama a esta función después de que el sidebar esté en el DOM
             } catch (err) {
                 console.error('Error loading sidebar:', err);
             }
@@ -91,7 +109,7 @@ async function navigate(pathname, addToHistory = true) {
         if (addToHistory) {
             history.pushState({}, "", pathname);
         }
-        
+
         runPageScripts(pathname);
 
     } catch (error) {
