@@ -1,0 +1,16 @@
+<body>
+  <h1>Notificaciones</h1>
+  <div id="notification-list"></div>
+
+  <script type="module">
+    import { renderNotifications } from '../scripts/notification-script.js';
+
+    const token = localStorage.getItem('token'); // o como lo estés guardando
+
+    if (token) {
+      renderNotifications(token);
+    } else {
+      document.getElementById('notification-list').innerHTML = '<p>Debes iniciar sesión para ver tus notificaciones.</p>';
+    }
+  </script>
+</body>
