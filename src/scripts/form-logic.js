@@ -1,6 +1,7 @@
 // src/scripts/form-logic.js
 import axios from 'axios';
 import { login, register } from '../services/auth.js';
+import { createProfile } from '../services/profile.service.js';
 
 // Nuevo servicio para obtener los roles
 const API_URL = 'http://localhost:3000';
@@ -117,4 +118,47 @@ export function setupRegisterForm(navigate) {
     if (loginLink) {
         // El enrutador ya maneja el clic
     }
+}
+
+export function setupProfileForm(navigate) {
+    const form = document.getElementById('profile-form');
+    const photoInput = document.getElementById('photoInput');
+    const previewImage = document.getElementById('previewImage');
+
+    if (!form) return;
+
+    // Vista previa de la foto de perfil
+    photoInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                previewImage.src = event.target.result;
+                previewImage.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('bio', form.bio.value);
+
+        if (photoInput.files[0]) {
+            formData.append('profilePhoto', photoInput.files[0]);
+        }
+
+        try {
+            await createProfile(formData);
+            localStorage.setItem('profileExists', 'true');
+            navigate('/home');
+            alert('¡Perfil creado exitosamente! Redirigiendo a tu página principal.');
+        } catch (err) {
+            const errorDiv = document.getElementById('profileError');
+            if (errorDiv) errorDiv.textContent = err.message || 'Error al crear el perfil';
+            alert(err.message || 'Error al crear el perfil');
+        }
+    };
 }

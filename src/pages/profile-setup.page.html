@@ -1,45 +1,39 @@
 <link rel="stylesheet" href="./src/styles/pages.style/profile-setup.style.css">
 
-    <div class="container">
-        <!-- Logo Header -->
-        <div class="logo-container">
-            <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Rectangle%20119-2AoVmf76AWWV2RnQZJYEK4Jcd3CvIy.png" alt="Riwi Logo" class="logo">
-        </div>
+<div class="container">
+    <div class="logo-container">
+        <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Rectangle%20119-2AoVmf76AWWV2RnQZJYEK4Jcd3CvIy.png" alt="Riwi Logo" class="logo">
+    </div>
 
-        <!-- Main Card -->
-        <div class="profile-card">
-            <div class="card-content">
-                <!-- Photo Section -->
+    <div class="profile-card">
+        <div class="card-content">
+            <form id="profile-form">
                 <div class="photo-section">
                     <h2 class="section-title">FOTO</h2>
                     <div class="photo-container">
                         <div class="photo-placeholder" id="photoPlaceholder">
-                            <input type="file" id="photoInput" accept="image/*" class="photo-input">
-                            <label for="photoInput" class="photo-label">
-                                <div class="upload-icon">📷</div>
-                                <span>Subir foto</span>
-                            </label>
+                            <input type="file" id="photoInput" name="profilePhoto" accept="image/*" class="photo-input" placeholder="📷 Subir foto">
                             <img id="previewImage" class="preview-image" style="display: none;">
                         </div>
                     </div>
                 </div>
 
-                <!-- Description Section -->
                 <div class="description-section">
                     <h2 class="section-title">DESCRIPCION</h2>
                     <textarea 
                         class="description-input" 
+                        id="bio"
+                        name="bio"
                         placeholder="Soy una persona comprometida, curiososa y en constante aprendizaje. Me gusta asumir nuevos retos..."
                         rows="4"
                     ></textarea>
                 </div>
-
-                <!-- Create Profile Button -->
-                <button class="create-button" onclick="createProfile()">
+                
+                <p id="profileError" class="error-message"></p>
+                <button type="submit" class="create-button">
                     CREAR PERFIL
                 </button>
-            </div>
+            </form>
         </div>
     </div>
-
-   
+</div>
