@@ -129,6 +129,10 @@ body {
   flex-direction: column;
   gap: 20px;
   overflow-y: auto;
+  scrollbar-width: none;
+}
+.main-content::-webkit-scrollbar {
+  display: none;
 }
 
 .post-creator {
@@ -164,6 +168,13 @@ body {
   background: transparent;
 }
 
+.preview-image {
+  margin-top: 15px;
+  border-radius: 15px;
+  overflow: hidden;
+  max-height: 300px;
+}
+
 .post-actions {
   display: flex;
   align-items: center;
@@ -189,8 +200,39 @@ body {
   background: #f5f5f5;
 }
 
+.delete-btn {
+  background: #705fff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.edit-btn {
+  background: #705fff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: auto;
+}
+
 .post-btn {
-  background: #333;
+  background: #705fff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.post-btn-c {
+  background: #705fff;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -200,6 +242,11 @@ body {
   margin-left: auto;
 }
 
+.feed {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 .posts-feed {
   display: flex;
   flex-direction: column;
@@ -209,19 +256,25 @@ body {
 .post {
   background: white;
   border-radius: 20px;
-  padding: 20px;
+  padding: 15px 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  height: auto
 }
 
 .post .post-header {
-  margin-bottom: 15px;
+  margin-bottom: 8px;
 }
 
-.post-info h4 {
+.post-author {
+  font-size: 19px;
+}
+
+.post-info  {
   font-size: 16px;
   font-weight: bold;
+  border-bottom: 0.2px solid #b1b1b1;
   color: #333;
-  margin-bottom: 5px;
+  margin-bottom: 15px;
 }
 
 .post-time {
@@ -229,16 +282,27 @@ body {
   color: #666;
 }
 
+.post-date {
+  font-size: 15px;
+  color: #a3a1a1;
+  margin-left: 400px;
+}
+
 .post-content p {
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 15px;
+  line-height: 1.5;
+  width: 80%;
   color: #333;
   margin-bottom: 15px;
+  margin-left: 1rem;
 }
 
 .post-image {
   border-radius: 15px;
   overflow: hidden;
+  overflow: hidden;
+  max-height: 300px;
+  margin-bottom: 15px;
 }
 
 .post-image img {
