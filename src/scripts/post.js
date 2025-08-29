@@ -17,13 +17,13 @@ function renderPost(post, currentProfileId) {
         : 'Usuario Desconocido'; 
 
     const profilePhotoUrl = post.Profile && post.Profile.profile_photo
-        ? `${API_URL}${post.Profile.profile_photo}`
+    ? post.Profile.profile_photo
         : 'assets/default-user.png';
     
     // Contenido multimedia
     let mediaContent = '';
     if (post.image_url) {
-        mediaContent = `<img src="${API_URL}${post.image_url}" alt="Post Image" class="post-image">`;
+    mediaContent = `<img src="${post.image_url}" alt="Post Image" class="post-image">`;
     } else if (post.code_url) {
         mediaContent = `<pre><code class="language-javascript">...</code></pre><p>Archivo de código: <a href="${API_URL}${post.code_url}">Descargar</a></p>`;
     } else if (post.file_url) {
@@ -150,7 +150,7 @@ async function updatePostCreatorProfilePhoto() {
         const postAvatarImg = document.querySelector('.post-creator .post-avatar');
         if (postAvatarImg && profile.profile_photo) {
             const API_URL = 'http://localhost:3000/';
-            postAvatarImg.src = `${API_URL}${profile.profile_photo}`;
+            postAvatarImg.src = profile.profile_photo;
         }
     } catch (error) {
         console.error('Error al actualizar la foto de perfil del creador de posts:', error);
@@ -189,7 +189,7 @@ function setEditMode(post) {
     previewArea.innerHTML = '';
     const API_URL = 'http://localhost:3000/';
     if (post.image_url) {
-        previewArea.innerHTML = `<img src="${API_URL}${post.image_url}" alt="Preview" class="preview-image">`;
+    previewArea.innerHTML = `<img src="${post.image_url}" alt="Preview" class="preview-image">`;
     } else if (post.code_url) {
         previewArea.innerHTML = `<div class="preview-code"><p>Archivo de código actual: <strong>${post.code_url.split('/').pop()}</strong></p></div>`;
     } else if (post.file_url) {
@@ -223,14 +223,14 @@ export function setupPostPage() {
             const postContent = postTextarea.value;
             const privacy = privacySelect.value;
             const formData = new FormData();
-            
+
             formData.append('text_content', postContent);
             formData.append('privacy', privacy);
-            
+
             const imageInput = document.getElementById('imageInput');
             const codeInput = document.getElementById('codeInput');
             const fileInput = document.getElementById('fileInput');
-            
+
             if (imageInput.files.length > 0) {
                 formData.append('postFile', imageInput.files[0]);
             } else if (codeInput.files.length > 0) {
@@ -238,16 +238,27 @@ export function setupPostPage() {
             } else if (fileInput.files.length > 0) {
                 formData.append('postFile', fileInput.files[0]);
             }
-            
+
+            // Log para depurar el FormData
+            for (let pair of formData.entries()) {
+                console.log('FormData:', pair[0], pair[1]);
+            }
+
             try {
+                let postResponse;
                 if (postBtn.dataset.mode === 'update') {
-                    await updatePost(currentEditingPostId, formData);
-                    console.log('Post actualizado con éxito');
+                    postResponse = await updatePost(currentEditingPostId, formData);
+                    console.log('Post actualizado con éxito', postResponse);
                     setCreateMode();
                 } else {
-                    await createPost(formData);
-                    console.log('Post creado con éxito');
+                    postResponse = await createPost(formData);
+                    console.log('Post creado con éxito', postResponse);
                     clearPostForm();
+                }
+                // Log para depurar la respuesta y el campo image_url
+                console.log('Respuesta del post:', postResponse);
+                if (postResponse && postResponse.image_url) {
+                    console.log('URL de imagen subida:', postResponse.image_url);
                 }
                 fetchAndRenderPosts();
             } catch (err) {
@@ -256,14 +267,7 @@ export function setupPostPage() {
             }
         });
     }
-    
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            clearPostForm();
-        });
-    }
-
-    // Llamadas a las funciones de inicialización
+    // Inicialización de la página de posts
     setupFilePreview();
     updatePostCreatorProfilePhoto();
     fetchAndRenderPosts();

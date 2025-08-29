@@ -7,7 +7,7 @@ export function renderNotification(notification) {
     card.className = 'card left';
     card.innerHTML = `
     <div class="notifications-title">NOTIFICATIONS</div>
-        <img src="${notification.profile_photo ? API_URL + notification.profile_photo : './src/images/default-avatar.png'}" alt="${notification.user_name || 'Usuario'}" class="avatar">
+    <img src="${notification.profile_photo ? notification.profile_photo : './src/images/default-avatar.png'}" alt="${notification.user_name || 'Usuario'}" class="avatar">
         <div class="info">
             <div class="top">
                 <span class="name">${notification.user_name || ''}</span>
