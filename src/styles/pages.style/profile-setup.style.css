@@ -39,14 +39,6 @@ body {
     padding: 70px;
 }
 
-/* Let's fix the width for better responsiveness */
-@media (min-width: 768px) {
-    .profile-card {
-        width: 100%;
-        max-width: 750px;
-    }
-}
-
 
 .card-content {
     background: #705FFF;

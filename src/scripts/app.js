@@ -8,6 +8,7 @@ const routes = {
   "/": "/src/pages/login.page.html",
   "/login": "/src/pages/login.page.html",
   "/register": "/src/pages/register.page.html",
+  "/notifications": "/src/pages/notifications.page.html",
   "/home": "/src/pages/home.page.html",
   "/profile-setup": "/src/pages/profile-setup.page.html"
 };
