@@ -7,12 +7,13 @@ import { getNotifications } from '../services/notification.service.js';
 import { initNotificationSocket } from './notification.socket.js';
 
 const routes = {
-  "/": "/src/pages/login.page.html",
-  "/login": "/src/pages/login.page.html",
-  "/register": "/src/pages/register.page.html",
-  "/home": "/src/pages/home.page.html",
-  "/notifications": "/src/pages/notifications.page.html",
-  "/profile-setup": "/src/pages/profile-setup.page.html"
+    "/": "/src/pages/login.page.html",
+    "/login": "/src/pages/login.page.html",
+    "/register": "/src/pages/register.page.html",
+    "/home": "/src/pages/home.page.html",
+    "/notifications": "/src/pages/notifications.page.html",
+    "/profile": "/src/pages/profile.page.html",
+    "/profile-setup": "/src/pages/profile-setup.page.html"
 };
 
 const protectedRoutes = ["/home", "/notifications", "/profile", "/chats", "/settings", "/profile-setup"];
