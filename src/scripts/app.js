@@ -28,7 +28,7 @@ async function updateSidebar() {
         const API_URL = 'http://localhost:3000/';
 
         if (userImage && userName && userEmail) {
-            userImage.src = profile.profile_photo ? `${API_URL}${profile.profile_photo}` : './src/images/default-avatar.png'; // Usa una imagen por defecto
+            userImage.src = profile.profile_photo ? profile.profile_photo : './src/images/default-avatar.png'; // Usa una imagen por defecto
             userName.textContent = `${profile.User.first_name} ${profile.User.last_name}`;
             userEmail.textContent = profile.User.email;
         }
@@ -133,7 +133,7 @@ function renderNotification(notification) {
     const card = document.createElement('div');
     card.className = 'card left';
     card.innerHTML = `
-        <img src="${notification.Profile?.profile_photo ? API_URL + notification.Profile.profile_photo : './src/images/default-avatar.png'}" alt="${notification.Profile?.User?.first_name || 'Usuario'}" class="avatar">
+    <img src="${notification.Profile?.profile_photo ? notification.Profile.profile_photo : './src/images/default-avatar.png'}" alt="${notification.Profile?.User?.first_name || 'Usuario'}" class="avatar">
         <div class="info">
             <div class="top">
                 <span class="name">${notification.Profile?.User?.first_name || ''} ${notification.Profile?.User?.last_name || ''}</span>
