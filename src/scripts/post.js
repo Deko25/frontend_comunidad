@@ -1,5 +1,4 @@
-
-import { createPost, getPosts, deletePost, updatePost } from '../services/post.service.js';
+import { createPost, getPosts, deletePost, updatePost, createComment, createReaction } from '../services/post.service.js';
 import { getProfileData } from '../services/profile.service.js';
 
 let currentEditingPostId = null;
@@ -49,6 +48,22 @@ function renderPost(post, currentProfileId) {
         `;
     }
 
+    // Lógica para mostrar las reacciones
+    const reactionCount = post.Reactions ? post.Reactions.length : 0;
+    const userReacted = post.Reactions ? post.Reactions.some(r => r.profile_id === currentProfileId) : false;
+    const reactionBtnClass = userReacted ? 'reacted' : '';
+
+    // Lógica para renderizar los comentarios
+    const commentsHtml = post.Comments.map(comment => `
+        <div class="comment-item">
+            <img src="${comment.Profile.profile_photo || 'assets/default-user.png'}" alt="User Avatar" class="comment-avatar">
+            <div class="comment-content">
+                <span class="comment-author">${comment.Profile.User.first_name} ${comment.Profile.User.last_name}</span>
+                <p>${comment.content}</p>
+            </div>
+        </div>
+    `).join('');
+
     postElement.innerHTML = `
         <div class="post-header">
             <img src="${profilePhotoUrl}" alt="User Avatar" class="post-avatar">
@@ -62,8 +77,27 @@ function renderPost(post, currentProfileId) {
             <p>${post.text_content}</p>
             ${mediaContent}
         </div>
+        <div class="post-stats">
+            <span class="reaction-count">👍 ${reactionCount}</span>
+            <span class="comment-count">💬 ${post.Comments.length}</span>
+        </div>
         <div class="post-actions">
+            <button class="reaction-btn ${reactionBtnClass}" data-post-id="${post.post_id}">
+                <span class="icon">👍</span> Reaccionar
+            </button>
+            <button class="comment-toggle-btn" data-post-id="${post.post_id}">
+                <span class="icon">💬</span> Comentar
+            </button>
             ${actionButtons}
+        </div>
+        <div class="comments-section" style="display: none;">
+            <div class="comments-list">
+                ${commentsHtml}
+            </div>
+            <div class="comment-form-container">
+                <input type="text" class="comment-input" placeholder="Escribe un comentario...">
+                <button class="send-comment-btn" data-post-id="${post.post_id}">Enviar</button>
+            </div>
         </div>
     `;
 
@@ -75,7 +109,7 @@ function renderPost(post, currentProfileId) {
                 try {
                     await deletePost(post.post_id);
                     console.log('Post eliminado con éxito');
-                    fetchAndRenderPosts(); // Recargar el feed
+                    fetchAndRenderPosts();
                 } catch (error) {
                     console.error('Error al eliminar el post:', error);
                     alert('No se pudo eliminar la publicación.');
@@ -92,8 +126,52 @@ function renderPost(post, currentProfileId) {
         });
     }
 
+    // --- NUEVOS MANEJADORES DE EVENTOS ---
+    
+    // Botón de reaccionar
+    const reactionBtn = postElement.querySelector('.reaction-btn');
+    if (reactionBtn) {
+        reactionBtn.addEventListener('click', async () => {
+            try {
+                await createReaction(post.post_id, 'like'); 
+                fetchAndRenderPosts(); // Recargar para ver los cambios
+            } catch (error) {
+                console.error('Error al crear la reacción:', error);
+            }
+        });
+    }
+
+    // Botón para mostrar/ocultar comentarios
+    const commentToggleBtn = postElement.querySelector('.comment-toggle-btn');
+    const commentsSection = postElement.querySelector('.comments-section');
+    if (commentToggleBtn && commentsSection) {
+        commentToggleBtn.addEventListener('click', () => {
+            const isVisible = commentsSection.style.display === 'block';
+            commentsSection.style.display = isVisible ? 'none' : 'block';
+        });
+    }
+
+    // Botón para enviar un comentario
+    const sendCommentBtn = postElement.querySelector('.send-comment-btn');
+    const commentInput = postElement.querySelector('.comment-input');
+    if (sendCommentBtn && commentInput) {
+        sendCommentBtn.addEventListener('click', async () => {
+            const content = commentInput.value.trim();
+            if (content) {
+                try {
+                    await createComment(post.post_id, content);
+                    commentInput.value = ''; // Limpiar el input
+                    fetchAndRenderPosts(); // Recargar para ver el nuevo comentario
+                } catch (error) {
+                    console.error('Error al enviar el comentario:', error);
+                }
+            }
+        });
+    }
+    
     return postElement;
 }
+
 
 // Función para obtener y renderizar todos los posts
 async function fetchAndRenderPosts() {
@@ -189,7 +267,7 @@ function setEditMode(post) {
     previewArea.innerHTML = '';
     const API_URL = 'http://localhost:3000/';
     if (post.image_url) {
-    previewArea.innerHTML = `<img src="${post.image_url}" alt="Preview" class="preview-image">`;
+        previewArea.innerHTML = `<img src="${post.image_url}" alt="Preview" class="preview-image">`;
     } else if (post.code_url) {
         previewArea.innerHTML = `<div class="preview-code"><p>Archivo de código actual: <strong>${post.code_url.split('/').pop()}</strong></p></div>`;
     } else if (post.file_url) {
@@ -239,7 +317,6 @@ export function setupPostPage() {
                 formData.append('postFile', fileInput.files[0]);
             }
 
-            // Log para depurar el FormData
             for (let pair of formData.entries()) {
                 console.log('FormData:', pair[0], pair[1]);
             }
@@ -255,7 +332,6 @@ export function setupPostPage() {
                     console.log('Post creado con éxito', postResponse);
                     clearPostForm();
                 }
-                // Log para depurar la respuesta y el campo image_url
                 console.log('Respuesta del post:', postResponse);
                 if (postResponse && postResponse.image_url) {
                     console.log('URL de imagen subida:', postResponse.image_url);
@@ -267,7 +343,7 @@ export function setupPostPage() {
             }
         });
     }
-    // Inicialización de la página de posts
+
     setupFilePreview();
     updatePostCreatorProfilePhoto();
     fetchAndRenderPosts();

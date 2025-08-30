@@ -13,6 +13,7 @@ const routes = {
     "/home": "/src/pages/home.page.html",
     "/notifications": "/src/pages/notifications.page.html",
     "/profile": "/src/pages/profile.page.html",
+    "/chats": "/src/pages/chats.page.html",
     "/profile-setup": "/src/pages/profile-setup.page.html"
 };
 
@@ -159,53 +160,53 @@ function timeAgo(date) {
     return `${Math.floor(diff / 86400)} días ago`;
 }
 
-        const logoutBtn = document.querySelector('.logout-btn');
-          if (logoutBtn) {
-              logoutBtn.addEventListener('click', () => {
-                  localStorage.removeItem('token');
-                  localStorage.removeItem('profileExists');
-                  navigate('/login');
-          });
-        }
+const logoutBtn = document.querySelector('.logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('profileExists');
+            navigate('/login');
+    });
+    }
 
-        if (addToHistory) {
-            history.pushState({}, "", pathname);
-        }
+    if (addToHistory) {
+    history.pushState({}, "", pathname);
+    }
 
-        runPageScripts(pathname);
+    runPageScripts(pathname);
 
     } catch (error) {
-        console.error('Error al cargar la página:', error);
+    console.error('Error al cargar la página:', error);
     }
 }
 
 function runPageScripts(pathname) {
-  if (pathname === '/login' || pathname === '/') {
-    setupLoginForm(navigate);
-  } else if (pathname === '/register') {
-    setupRegisterForm(navigate);
-  } else if (pathname === '/home') {
-    setupPostPage(navigate);
-  } else if (pathname === '/profile-setup') {
-    setupProfileForm(navigate);
-  }
+    if (pathname === '/login' || pathname === '/') {
+        setupLoginForm(navigate);
+    } else if (pathname === '/register') {
+        setupRegisterForm(navigate);
+    } else if (pathname === '/home') {
+        setupPostPage(navigate);
+    } else if (pathname === '/profile-setup') {
+        setupProfileForm(navigate);
+    }
 };
 
 document.body.addEventListener("click", (e) => {
-  const link = e.target.closest("[data-link]");
-  if (link) {
-    e.preventDefault();
-    const path = link.getAttribute("href");
-    navigate(path);
-  }
+    const link = e.target.closest("[data-link]");
+    if (link) {
+        e.preventDefault();
+        const path = link.getAttribute("href");
+        navigate(path);
+    }
 });
 
 window.addEventListener("popstate", () => {
-  navigate(location.pathname, false);
+    navigate(location.pathname, false);
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-  navigate(location.pathname, false);
+    navigate(location.pathname, false);
 });
 
 export { navigate };
