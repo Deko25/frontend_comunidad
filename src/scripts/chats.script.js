@@ -8,6 +8,7 @@ let currentUser = null;
 let selectedUser = null;
 let currentChatId = null;
 let chatIds = [];
+let allUsersCache = null; // cache de todos los usuarios (sin el actual)
 let chatReady = false;
 const messageCache = new Map(); // key: otherUserId, value: { messages: [], hasMore, oldestTs, chatId }
 
@@ -34,10 +35,13 @@ async function renderConversationList(preserveSelection = true) {
     if (!Array.isArray(conversations)) conversations = [];
     if (!userListEl) return;
     userListEl.innerHTML = '';
-    if (!conversations.length) {
-        userListEl.innerHTML = '<div>No hay conversaciones</div>';
-    updateSelectedHeaderStatus();
-    return;
+    const hasConversations = conversations.length > 0;
+    if (!hasConversations) {
+        // Mensaje informativo pero continuamos para mostrar usuarios disponibles
+        const msg = document.createElement('div');
+        msg.className = 'no-conv-msg';
+        msg.textContent = 'No hay conversaciones todavía';
+        userListEl.appendChild(msg);
     }
     window.lastConversations = conversations;
     conversations.forEach(conv => {
@@ -67,6 +71,40 @@ async function renderConversationList(preserveSelection = true) {
         }
         userListEl.appendChild(el);
     });
+    // Después de renderizar (o si no hay) conversaciones, añadir usuarios sin conversación
+    try {
+        if (!allUsersCache) {
+            const resUsers = await fetch(`${API_URL}/chat/users`, { headers: { 'Authorization': `Bearer ${token}` } });
+            allUsersCache = await resUsers.json();
+            if (!Array.isArray(allUsersCache)) allUsersCache = [];
+        }
+        const existingIds = new Set(conversations.map(c => (c.otherUser ? c.otherUser.user_id : null)).filter(Boolean));
+        const usersWithoutConversation = allUsersCache.filter(u => !existingIds.has(u.user_id));
+        if (usersWithoutConversation.length) {
+            const sep = document.createElement('div');
+            sep.className = 'conv-separator';
+            sep.textContent = 'Usuarios';
+            userListEl.appendChild(sep);
+            usersWithoutConversation.forEach(user => {
+                const el = document.createElement('div');
+                el.className = 'conversation-item new-user';
+                el.dataset.uid = user.user_id;
+                const avatarUrl = user.profile_photo || './src/images/default-avatar.png';
+                const onlineStatus = window.onlineUsers && window.onlineUsers.includes(user.user_id) ? '🟢' : '⚪';
+                el.innerHTML = `
+                  <img src="${avatarUrl}" alt="${user.first_name}" class="conv-avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+                  <div class="conv-main">
+                     <div class="conv-top"><span class="conv-name">${user.first_name} ${user.last_name}</span><span class="conv-time"></span></div>
+                     <div class="conv-bottom"><span class="conv-last">Iniciar conversación</span></div>
+                  </div>
+                  <span class="conv-status">${onlineStatus}</span>`;
+                el.onclick = () => selectUser(user, null); // forzará ensureChat
+                userListEl.appendChild(el);
+            });
+        }
+    } catch (e) {
+        console.error('Error listando usuarios sin conversación:', e);
+    }
     updateSelectedHeaderStatus();
 }
 
@@ -231,8 +269,8 @@ sendBtnEl.onclick = async () => {
         }
         cacheEntry.messages.push(msg);
         renderMessages(cacheEntry, selectedUser.user_id, true);
-        // Emitir por socket (optimista)
-        sendMessage(currentChatId, selectedUser.user_id, content);
+    // NO enviar vía socket aquí: el endpoint REST ya guarda y emite 'new_message'.
+    // Enviar también por socket duplicaba el mensaje en la BD.
         // Refrescar lista conversaciones para mover esta arriba
         renderConversationList();
     } catch (e) {
@@ -301,7 +339,17 @@ window.onTyping = (userId) => {
 (async () => {
     currentUser = await getProfileData();
     console.log('[FRONT] currentUser:', currentUser);
-    const userId = currentUser.User ? currentUser.User.user_id : currentUser.user_id || currentUser.user_id;
+    // Asegurar userId correcto: si el include User no trae user_id, usar el root (Profile.user_id)
+    let userId = null;
+    if (currentUser && currentUser.User && typeof currentUser.User.user_id !== 'undefined') {
+        userId = currentUser.User.user_id;
+    } else if (currentUser && typeof currentUser.user_id !== 'undefined') {
+        userId = currentUser.user_id;
+    }
+    if (userId === null || userId === undefined) {
+        console.error('[FRONT][CHAT] No se pudo determinar userId. Abortando initChatSocket.');
+        return;
+    }
     // Obtener los chatIds del usuario actual (endpoint dedicado)
     const token = localStorage.getItem('token');
     let chatIds = [];
