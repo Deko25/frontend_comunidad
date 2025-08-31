@@ -42,6 +42,7 @@ body {
   border-radius: 50%;
   overflow: hidden;
   margin-right: 15px;
+  border: 1px solid;
 }
 
 .user-avatar img {
@@ -153,6 +154,7 @@ body {
   height: 50px;
   border-radius: 50%;
   margin-right: 15px;
+  border: 1px solid;
 }
 
 .post-input {
@@ -182,24 +184,63 @@ body {
   flex-wrap: wrap;
 }
 
-.post-action-btn {
-  background: none;
+/* Hamburguer Menu Styles */
+.post-options-menu {
+  position: relative; 
+  margin-left: auto;
+}
+
+.menu-toggle-btn {
+  background: transparent;
   border: none;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #666;
-  font-size: 14px;
+  font-size: 20px;
+  color: #65676b;
   cursor: pointer;
-  padding: 8px 12px;
+  padding: 5px;
+}
+
+.menu-dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  min-width: 120px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
   border-radius: 8px;
-  transition: all 0.3s ease;
+  margin-top: 5px;
+  padding: 5px;
+  flex-direction: column;
+  gap: 5px;
 }
 
-.post-action-btn:hover {
-  background: #f5f5f5;
+.post-options-menu:hover .menu-dropdown-content,
+.post-options-menu:focus-within .menu-dropdown-content {
+  display: flex;
 }
 
+.menu-dropdown-content .edit-btn,
+.menu-dropdown-content .delete-btn {
+  background: none;
+  color: #333;
+  border: none;
+  text-align: left;
+  padding: 8px 12px;
+  font-weight: normal;
+  transition: background-color 0.2s;
+  width: 100%;
+  border-radius: 5px;
+}
+
+.menu-dropdown-content .edit-btn:hover,
+.menu-dropdown-content .delete-btn:hover {
+  background-color: #f2f3f5;
+  color: #000;
+}
+
+/* Original delete-btn and edit-btn are no longer needed as they are handled by the menu */
+/*
 .delete-btn {
   background: #705fff;
   color: white;
@@ -209,7 +250,6 @@ body {
   font-weight: bold;
   cursor: pointer;
 }
-
 
 .edit-btn {
   background: #705fff;
@@ -221,6 +261,7 @@ body {
   cursor: pointer;
   margin-left: auto;
 }
+*/
 
 .post-btn {
   background: #705fff;
@@ -466,3 +507,336 @@ body {
   color: #333;
 }
 
+/* Post stats and actions styles */
+.post-stats {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #65676b;
+}
+
+.reaction-count {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 8px;
+    border-radius: 15px;
+    background: white;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.reaction-count:hover {
+    background: #e4e6ea;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.comment-count {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 8px;
+    border-radius: 15px;
+    background: white;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.comment-count:hover {
+    background: #e4e6ea;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.post-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    border-top: 1px solid #e4e6ea;
+    border-bottom: 1px solid #e4e6ea;
+    position: relative;
+}
+
+.reaction-buttons-container {
+    position: relative;
+    display: inline-block;
+}
+
+.reaction-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: #65676b;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.reaction-btn:hover {
+    background: #f2f3f5;
+}
+
+.reaction-btn.reacted {
+    color: #1877f2;
+}
+
+.reaction-btn.reacted.love {
+    color: #e41e3f;
+}
+
+.reaction-btn.reacted.laugh {
+    color: #f7b928;
+}
+
+.reaction-btn.reacted.angry {
+    color: #e41e3f;
+}
+
+.reactions-dropdown {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border-radius: 25px;
+    padding: 8px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    display: none;
+    flex-direction: row;
+    gap: 5px;
+    z-index: 1000;
+    margin-bottom: 8px;
+    border: 1px solid #e4e6ea;
+}
+
+.reaction-buttons-container:hover .reactions-dropdown {
+    display: flex;
+    animation: slideUp 0.3s ease-out forwards;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(10px) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+    }
+}
+
+.reaction-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px;
+    border: none;
+    background: transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+    width: 45px;
+    height: 45px;
+    justify-content: center;
+}
+
+.reaction-option .emoji {
+    font-size: 24px;
+    transition: all 0.3s ease;
+}
+
+.reaction-option:hover {
+    transform: translateY(-8px) scale(1.2);
+    background: rgba(0,0,0,0.05);
+}
+
+.reaction-option::after {
+    content: attr(data-name);
+    position: absolute;
+    bottom: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1001;
+}
+
+.reaction-option:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-5px);
+}
+
+.reaction-option::before {
+    content: '';
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 4px solid #333;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1001;
+}
+
+.reaction-option:hover::before {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-5px);
+}
+
+.comment-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: #65676b;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.comment-toggle-btn:hover {
+    background: #f2f3f5;
+}
+
+.comment-toggle-btn .icon::before {
+    content: "💬";
+    font-size: 16px;
+}
+
+.comments-section {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 0 0 8px 8px;
+    transition: all 0.3s ease;
+}
+
+.comments-section.show {
+    display: block !important;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 500px;
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+}
+
+.comments-list {
+    margin-bottom: 15px;
+}
+
+.comment-form-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.comment-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ccd0d5;
+    border-radius: 20px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.comment-input:focus {
+    border-color: #1877f2;
+}
+
+.send-comment-btn {
+    padding: 8px 16px;
+    background: #1877f2;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.send-comment-btn:hover {
+    background: #166fe5;
+}
+
+.send-comment-btn:disabled {
+    background: #e4e6ea;
+    color: #bcc0c4;
+    cursor: not-allowed;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .post-actions {
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    
+    .reaction-btn,
+    .comment-toggle-btn {
+        flex: 1;
+        min-width: 0;
+        justify-content: center;
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+    
+    .reactions-dropdown {
+        transform: translateX(-30%);
+    }
+    
+    .reaction-option {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .reaction-option .emoji {
+        font-size: 20px;
+    }
+}

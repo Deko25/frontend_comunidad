@@ -59,3 +59,29 @@ export async function updatePost(postId, postData) {
         throw error.response?.data || error;
     }
 };
+
+export async function createComment(postId, content) {
+    try {
+        const response = await axios.post(`${API_URL}/posts/${postId}/comments`, { content }, {
+            headers: {
+                'Authorization': `Bearer ${getToken()}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || error;
+    }
+};
+
+export async function createReaction(postId, reactionType) {
+    try {
+        const response = await axios.post(`${API_URL}/posts/${postId}/reactions`, { reaction_type: reactionType }, {
+            headers: {
+                'Authorization': `Bearer ${getToken()}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || error;
+    }
+};
