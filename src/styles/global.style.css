@@ -143,7 +143,7 @@ body {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
-.post-header {
+.post-header-preview {
   display: flex;
   align-items: center;
   margin-bottom: 15px;
@@ -168,6 +168,7 @@ body {
   font-size: 16px;
   color: #999;
   background: transparent;
+  margin-top: 20px;
 }
 
 .preview-image {
@@ -183,6 +184,15 @@ body {
   gap: 15px;
   flex-wrap: wrap;
 }
+
+.post-action-btn{
+  height: 20px;
+  border-radius: 8px;
+  background-color: white;
+  border: none;
+  font-size: 15px ;
+}
+
 
 /* Hamburguer Menu Styles */
 .post-options-menu {
@@ -222,8 +232,8 @@ body {
 
 .menu-dropdown-content .edit-btn,
 .menu-dropdown-content .delete-btn {
-  background: none;
-  color: #333;
+  background: #705fff;
+  color: white;
   border: none;
   text-align: left;
   padding: 8px 12px;
@@ -273,6 +283,11 @@ body {
   cursor: pointer;
 }
 
+.post-btn:hover {
+  background-color: #f2f3f5;
+  color: #000;
+}
+
 .post-btn-c {
   background: #705fff;
   color: white;
@@ -282,6 +297,11 @@ body {
   font-weight: bold;
   cursor: pointer;
   margin-left: auto;
+}
+
+.post-btn-c:hover {
+  background-color: #f2f3f5;
+  color: #000;
 }
 
 .feed {
@@ -303,20 +323,31 @@ body {
   height: auto
 }
 
-.post .post-header {
+
+
+.post-header {
   margin-bottom: 8px;
 }
+
+
+
 
 .post-author {
   font-size: 19px;
 }
 
 .post-info  {
+  display:flex ;
+  justify-content: space-between;
   font-size: 16px;
   font-weight: bold;
   border-bottom: 0.2px solid #b1b1b1;
   color: #333;
-  margin-bottom: 15px;
+  padding: 10px;
+}
+.post-auth-info {
+  display: flex;
+  align-items: center;
 }
 
 .post-time {
@@ -327,31 +358,38 @@ body {
 .post-date {
   font-size: 15px;
   color: #a3a1a1;
-  margin-left: 400px;
+}
+
+.post-details {
+  display: flex;
+  align-items:center;
+  gap: 8px;
 }
 
 .post-content p {
   font-size: 15px;
-  line-height: 1.5;
-  width: 80%;
-  color: #333;
+  border-radius: 15px;
+  overflow: hidden;
+  overflow: hidden;
+  max-height: 450px;
   margin-bottom: 15px;
-  margin-left: 1rem;
+  margin-top: 15px;
+  color: #333;
+  padding: 20px 15px;
+  border-radius:15px;
+  background-color: #f2f3f5;
+  
 }
 
 .post-image {
   border-radius: 15px;
   overflow: hidden;
   overflow: hidden;
-  max-height: 300px;
+  max-height: 508px;
   margin-bottom: 15px;
 }
 
-.post-image img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
+
 
 /* Right Sidebar */
 .right-sidebar {
@@ -513,7 +551,6 @@ body {
     align-items: center;
     gap: 15px;
     padding: 10px 15px;
-    background: #f8f9fa;
     border-radius: 8px;
     margin-bottom: 10px;
     font-size: 14px;
@@ -526,16 +563,10 @@ body {
     gap: 5px;
     padding: 5px 8px;
     border-radius: 15px;
-    background: white;
+    background: #f8f9fa;
     transition: all 0.3s ease;
     cursor: pointer;
     font-weight: 500;
-}
-
-.reaction-count:hover {
-    background: #e4e6ea;
-    transform: translateY(-2px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 .comment-count {
@@ -544,7 +575,7 @@ body {
     gap: 5px;
     padding: 5px 8px;
     border-radius: 15px;
-    background: white;
+    background: #f8f9fa;
     transition: all 0.3s ease;
     cursor: pointer;
     font-weight: 500;
@@ -741,8 +772,44 @@ body {
 .comments-section {
     padding: 15px;
     background: #f8f9fa;
-    border-radius: 0 0 8px 8px;
+    border-radius: 0 0 10px 10px;
     transition: all 0.3s ease;
+    margin-left: auto;
+    margin-right: auto;
+    
+    width: 80%;
+}
+
+.comment-item {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+  gap: 20px;
+
+}
+
+.comment-profile {
+  display: flex;
+  align-items: center;
+}
+
+.comment-avatar{
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  margin-right: 15px;
+  border: 1px solid;
+}
+
+.comment-author{
+  font-size: 17px;
+}
+
+.comment-content {
+  padding: 10px 5px;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #b1b1b1;
+  
 }
 
 .comments-section.show {
@@ -767,6 +834,7 @@ body {
 
 .comments-list {
     margin-bottom: 15px;
+
 }
 
 .comment-form-container {
@@ -786,12 +854,12 @@ body {
 }
 
 .comment-input:focus {
-    border-color: #1877f2;
+    border-color: #705FFF;
 }
 
 .send-comment-btn {
     padding: 8px 16px;
-    background: #1877f2;
+    background: #705FFF;
     color: white;
     border: none;
     border-radius: 20px;
@@ -802,7 +870,8 @@ body {
 }
 
 .send-comment-btn:hover {
-    background: #166fe5;
+    background: #f2f3f5;
+    color: #000;
 }
 
 .send-comment-btn:disabled {
