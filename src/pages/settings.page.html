@@ -17,7 +17,7 @@
             </div>
         <div class="main-container">
             <div class="inner-container">
-                <button class="settings-button first-button">
+                <button class="settings-button first-button" id="edit-profile-btn">
                     <i class="fas fa-user"></i>
                     <div class="button-text">Perfil (cambiar foto)</div>
                 </button>
@@ -29,7 +29,7 @@
                     <i class="fas fa-lock"></i>
                     <div class="button-text">Cambiar contraseña</div>
                 </button>
-                <button class="settings-button fourth-button">
+                <button class="settings-button fourth-button" id="logout-settings-btn">
                     <i class="fas fa-cog"></i>
                     <div class="button-text">Cerrar sesión</div>
                 </button>
@@ -37,3 +37,24 @@
             </div>
         </div>
     </div>
+
+<!-- Modal para editar foto de perfil -->
+<div id="edit-profile-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <button class="modal-close-btn">&times;</button>
+        <h2>Editar Foto de Perfil</h2>
+        <form id="profile-photo-form">
+            <div class="form-group">
+                <label for="photoInputModal">Selecciona una nueva foto:</label>
+                <input type="file" id="photoInputModal" name="profilePhoto" accept="image/*" class="form-input">
+            </div>
+            <div class="preview-container">
+                <img id="previewImageModal" src="#" alt="Vista previa de la imagen" style="display: none;">
+            </div>
+            <div class="modal-actions">
+                <button type="submit" class="btn-save">Guardar Cambios</button>
+                <button type="button" class="btn-cancel">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>

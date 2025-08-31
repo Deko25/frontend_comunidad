@@ -51,3 +51,43 @@ export const getProfileData = async () => { // <-- Agrega esta nueva función
         throw error;
     }
 };
+
+
+export const updateProfile = async (formData) => {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Authentication token not found');
+
+    try {
+        const response = await axios.put(`${API_URL}/api/profile`, formData, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                // Axios y el navegador se encargarán de establecer el Content-Type correcto con FormData
+            },
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || error;
+    }
+};
+
+export const updateProfilePhoto = async (formData) => {
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error('Authentication token not found');
+
+  try {
+    const response = await axios.put(
+      `${API_URL}/api/profile/photo`, // 👈 aquí agregamos /api
+      formData,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};

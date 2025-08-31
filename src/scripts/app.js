@@ -4,6 +4,7 @@ import { setupLoginForm, setupRegisterForm, setupProfileForm } from './form-logi
 import { checkProfileStatus, getProfileData } from '../services/profile.service.js'; // Importa getProfileData
 import { setupPostPage } from './post.js';
 import { getNotifications } from '../services/notification.service.js';
+import { setupSettingsPage } from './settings.js'; // Agregue
 import { initNotificationSocket } from './notification.socket.js';
 
 const routes = {
@@ -190,6 +191,15 @@ function runPageScripts(pathname) {
         setupPostPage(navigate);
     } else if (pathname === '/profile-setup') {
         setupProfileForm(navigate);
+    } 
+    
+    
+    
+    
+    
+    
+    else if (pathname === '/settings') {
+        setupSettingsPage(navigate); // 👈 Aquí activamos tu lógica del modal
     }
 };
 
