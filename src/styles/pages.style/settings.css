@@ -1,0 +1,294 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(135deg, #c8b5ff 0%, #b8a5ff 100%);
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Esto asegura que no haya scroll en el body */
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 280px 1fr 300px;
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  height: calc(100vh - 40px);
+}
+
+/* Left Sidebar */
+.sidebar {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.user-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 15px;
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-info h3 {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.user-info p {
+  font-size: 14px;
+  color: #666;
+}
+
+.nav-menu {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  border-radius: 15px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.nav-item:hover {
+  background-color: #705fff;
+  color: white;
+}
+
+.nav-item.active {
+  background-color: #705fff;
+  color: white;
+}
+
+.nav-icon {
+  margin-right: 15px;
+  font-size: 18px;
+}
+
+.logout-btn {
+  background: #705fff;
+  color: white;
+  border: none;
+  padding: 15px 20px;
+  border-radius: 15px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  margin: 20px 0;
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: #5a4bcc;
+}
+
+.riwi-logo {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.riwi-logo img {
+  max-width: 100%;
+  height: auto;
+}
+
+.page-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.main-container {
+    margin-top: 60px;
+    width: 1000px;
+    height: 850px;
+    background-color: #FFFFFF;
+    border-radius: 25px;
+    position: relative;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    left: 120px;
+}
+
+.header-container {
+    width: 545px;
+    height: 45px;
+    background-color: #FFFFFF;
+    border-radius: 25px;
+    position: absolute;
+    left: 350px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 20px;
+    margin-left: 300px;
+}
+
+.header-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #4A4A6A;
+    margin: 0;
+}
+
+.header-right-buttons {
+    top: 20px;
+    width: 210px;
+    height: 45px;
+    background-color: #FFFFFF;
+    border-radius: 25px;
+    position: absolute;
+    left: 1442px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 10px;
+}
+
+.button-icon-container {
+    background-color: #D5D6F2;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    /* Propiedades para eliminar estilos por defecto del botón */
+    border: none;
+    cursor: pointer;
+    padding: 0; /* Elimina el padding por defecto del botón */
+
+    /* Agregado para el efecto de hover */
+    transition: transform 0.2s ease-in-out;
+}
+
+.button-icon-container:hover {
+    transform: scale(1.1); /* Agranda el botón un 10% */
+}
+
+.button-icon-container i {
+    font-size: 18px;
+    color: #4A4A6A;
+}
+
+.logo-text {
+    font-size: 14px;
+    font-weight: bold;
+    color: #6C66E4;
+}
+
+.logo-subtext {
+    font-size: 10px;
+    color: #4A4A6A;
+}
+
+.inner-container {
+    width: 88%;
+    height: 90%;
+    background-color: rgba(112, 95, 255, 0.6);
+    border-radius: 25px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    position: absolute;
+    top: 40px;
+    left: 57px;
+}
+
+.settings-button {
+    width: 467px;
+    height: 50px;
+    background-color: rgba(112, 95, 255, 0.6);
+    border-radius: 25px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    position: absolute;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    box-sizing: border-box;
+    color: #000;
+    left: 110px;
+
+    /* Propiedades añadidas para que el botón se vea como un div */
+    border: none;
+    background: none;
+    cursor: pointer;
+    background-color: rgba(112, 95, 255, 0.6);
+    
+    /* Agregamos una transición para un efecto suave al hacer hover */
+    transition: transform 0.2s ease-in-out; 
+}
+
+/* Efecto al pasar el mouse sobre el botón */
+.settings-button:hover {
+    transform: scale(1.02); /* Escala el botón un 2% más grande */
+}
+
+/* Opcional: Eliminar el contorno al hacer focus (navegación con teclado) */
+.settings-button:focus {
+    outline: none;
+}
+
+.settings-button i {
+    font-size: 24px;
+    margin-right: 20px;
+}
+
+.settings-button .button-text {
+    font-size: 18px;
+    color: #4A4A6A;
+}
+
+/* Las coordenadas de los botones son relativas al inner-container */
+.first-button {
+    top: 30px;
+}
+
+.second-button {
+    top: 120px;
+}
+
+.third-button {
+    top: 210px;
+}
+
+.fourth-button {
+    top: 300px;
+}

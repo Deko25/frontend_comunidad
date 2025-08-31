@@ -3,14 +3,12 @@ import { getProfileData } from '../services/profile.service.js';
 
 let currentEditingPostId = null;
 
-// Función para renderizar cada post en el feed
 function renderPost(post, currentProfileId) {
     const postElement = document.createElement('div');
     postElement.classList.add('post');
 
     const API_URL = 'http://localhost:3000/';
 
-    // Accede a los datos del perfil y usuario de forma segura
     const authorName = post.Profile && post.Profile.User
         ? `${post.Profile.User.first_name} ${post.Profile.User.last_name}`
         : 'Usuario Desconocido'; 
@@ -19,7 +17,6 @@ function renderPost(post, currentProfileId) {
     ? post.Profile.profile_photo
         : 'assets/default-user.png';
     
-    // Contenido multimedia
     let mediaContent = '';
     if (post.image_url) {
     mediaContent = `<img src="${post.image_url}" alt="Post Image" class="post-image">`;
@@ -29,7 +26,6 @@ function renderPost(post, currentProfileId) {
         mediaContent = `<p>Archivo adjunto: <a href="${API_URL}${post.file_url}">Descargar</a></p>`;
     }
 
-    // Emoji de privacidad
     let privacyEmoji = '';
     if (post.privacy === 'Public') {
         privacyEmoji = '🌍';
@@ -39,21 +35,30 @@ function renderPost(post, currentProfileId) {
         privacyEmoji = '🔒';
     }
     
-    // Añadir botones de editar y eliminar solo si el post es del usuario logueado
+    // --- Lógica del menú de hamburguesa ---
     let actionButtons = '';
     if (post.profile_id === currentProfileId) {
         actionButtons = `
-            <button class="edit-btn" data-post-id="${post.post_id}">Editar</button>
-            <button class="delete-btn" data-post-id="${post.post_id}">Eliminar</button>
+            <div class="post-options-menu">
+                <button class="menu-toggle-btn">
+                    <i class="fas fa-ellipsis-h"></i>
+                </button>
+                <div class="menu-dropdown-content">
+                    <button class="edit-btn" data-post-id="${post.post_id}">Editar</button>
+                    <button class="delete-btn" data-post-id="${post.post_id}">Eliminar</button>
+                </div>
+            </div>
         `;
     }
 
-    // Lógica para mostrar las reacciones
-    const reactionCount = post.Reactions ? post.Reactions.length : 0;
-    const userReacted = post.Reactions ? post.Reactions.some(r => r.profile_id === currentProfileId) : false;
-    const reactionBtnClass = userReacted ? 'reacted' : '';
+    const reactionsByType = post.Reactions.reduce((acc, reaction) => {
+        acc[reaction.reaction_type] = (acc[reaction.reaction_type] || 0) + 1;
+        return acc;
+    }, {});
 
-    // Lógica para renderizar los comentarios
+    const userReaction = post.Reactions.find(r => r.profile_id === currentProfileId);
+    const userReactionType = userReaction ? userReaction.reaction_type : null;
+    
     const commentsHtml = post.Comments.map(comment => `
         <div class="comment-item">
             <img src="${comment.Profile.profile_photo || 'assets/default-user.png'}" alt="User Avatar" class="comment-avatar">
@@ -63,6 +68,22 @@ function renderPost(post, currentProfileId) {
             </div>
         </div>
     `).join('');
+    
+    let mainReactionButtonHtml = '';
+    let mainReactionEmoji = '👍';
+    if (userReactionType) {
+        if (userReactionType === 'like') mainReactionEmoji = '👍';
+        if (userReactionType === 'love') mainReactionEmoji = '❤️';
+        if (userReactionType === 'laugh') mainReactionEmoji = '😂';
+        if (userReactionType === 'angry') mainReactionEmoji = '😡';
+    }
+    
+    mainReactionButtonHtml = `
+        <button class="main-reaction-btn reaction-btn" data-post-id="${post.post_id}" data-reaction-type="${userReactionType || 'like'}">
+            <span class="icon">${mainReactionEmoji}</span>
+            <span>${userReactionType || 'Me gusta'}</span>
+        </button>
+    `;
 
     postElement.innerHTML = `
         <div class="post-header">
@@ -78,15 +99,24 @@ function renderPost(post, currentProfileId) {
             ${mediaContent}
         </div>
         <div class="post-stats">
-            <span class="reaction-count">👍 ${reactionCount}</span>
+            <span class="reaction-count">👍 ${reactionsByType.like || 0}</span>
+            <span class="reaction-count">❤️ ${reactionsByType.love || 0}</span>
+            <span class="reaction-count">😂 ${reactionsByType.laugh || 0}</span>
+            <span class="reaction-count">😡 ${reactionsByType.angry || 0}</span>
             <span class="comment-count">💬 ${post.Comments.length}</span>
         </div>
         <div class="post-actions">
-            <button class="reaction-btn ${reactionBtnClass}" data-post-id="${post.post_id}">
-                <span class="icon">👍</span> Reaccionar
-            </button>
+            <div class="reaction-buttons-container">
+                ${mainReactionButtonHtml}
+                <div class="reactions-dropdown">
+                    <button class="reaction-option" data-reaction-type="like" data-post-id="${post.post_id}">👍</button>
+                    <button class="reaction-option" data-reaction-type="love" data-post-id="${post.post_id}">❤️</button>
+                    <button class="reaction-option" data-reaction-type="laugh" data-post-id="${post.post_id}">😂</button>
+                    <button class="reaction-option" data-reaction-type="angry" data-post-id="${post.post_id}">😡</button>
+                </div>
+            </div>
             <button class="comment-toggle-btn" data-post-id="${post.post_id}">
-                <span class="icon">💬</span> Comentar
+                <span class="icon"></span> Comentarios
             </button>
             ${actionButtons}
         </div>
@@ -101,14 +131,14 @@ function renderPost(post, currentProfileId) {
         </div>
     `;
 
-    // Manejadores de eventos para los botones de acción
+    // --- MANEJADORES DE EVENTOS ---
+
     const deleteBtn = postElement.querySelector('.delete-btn');
     if (deleteBtn) {
         deleteBtn.addEventListener('click', async () => {
             if (confirm('¿Estás seguro de que quieres eliminar esta publicación?')) {
                 try {
                     await deletePost(post.post_id);
-                    console.log('Post eliminado con éxito');
                     fetchAndRenderPosts();
                 } catch (error) {
                     console.error('Error al eliminar el post:', error);
@@ -126,22 +156,6 @@ function renderPost(post, currentProfileId) {
         });
     }
 
-    // --- NUEVOS MANEJADORES DE EVENTOS ---
-    
-    // Botón de reaccionar
-    const reactionBtn = postElement.querySelector('.reaction-btn');
-    if (reactionBtn) {
-        reactionBtn.addEventListener('click', async () => {
-            try {
-                await createReaction(post.post_id, 'like'); 
-                fetchAndRenderPosts(); // Recargar para ver los cambios
-            } catch (error) {
-                console.error('Error al crear la reacción:', error);
-            }
-        });
-    }
-
-    // Botón para mostrar/ocultar comentarios
     const commentToggleBtn = postElement.querySelector('.comment-toggle-btn');
     const commentsSection = postElement.querySelector('.comments-section');
     if (commentToggleBtn && commentsSection) {
@@ -151,7 +165,6 @@ function renderPost(post, currentProfileId) {
         });
     }
 
-    // Botón para enviar un comentario
     const sendCommentBtn = postElement.querySelector('.send-comment-btn');
     const commentInput = postElement.querySelector('.comment-input');
     if (sendCommentBtn && commentInput) {
@@ -160,20 +173,35 @@ function renderPost(post, currentProfileId) {
             if (content) {
                 try {
                     await createComment(post.post_id, content);
-                    commentInput.value = ''; // Limpiar el input
-                    fetchAndRenderPosts(); // Recargar para ver el nuevo comentario
+                    commentInput.value = '';
+                    fetchAndRenderPosts();
                 } catch (error) {
-                    console.error('Error al enviar el comentario:', error);
+                console.error('Error al enviar el comentario:', error);
                 }
             }
         });
     }
-    
+
+    const reactionBtnContainer = postElement.querySelector('.reaction-buttons-container');
+    const reactionsDropdown = postElement.querySelector('.reactions-dropdown');
+    const reactionOptions = reactionsDropdown.querySelectorAll('.reaction-option');
+
+    reactionOptions.forEach(option => {
+        option.addEventListener('click', async () => {
+            const reactionType = option.dataset.reactionType;
+            try {
+                await createReaction(post.post_id, reactionType);
+                fetchAndRenderPosts();
+            } catch (error) {
+                console.error('Error al enviar la reacción:', error);
+            }
+        });
+    });
+
     return postElement;
 }
 
 
-// Función para obtener y renderizar todos los posts
 async function fetchAndRenderPosts() {
     try {
         const profile = await getProfileData();
@@ -192,7 +220,6 @@ async function fetchAndRenderPosts() {
     }
 }
 
-// Función para previsualizar los archivos
 function setupFilePreview() {
     const imageInput = document.getElementById('imageInput');
     const codeInput = document.getElementById('codeInput');
@@ -221,7 +248,6 @@ function setupFilePreview() {
     fileInput.addEventListener('change', handleFileChange);
 }
 
-// Función para actualizar la foto de perfil en el creador de posts
 async function updatePostCreatorProfilePhoto() {
     try {
         const profile = await getProfileData();
@@ -235,7 +261,6 @@ async function updatePostCreatorProfilePhoto() {
     }
 }
 
-// Función para limpiar el formulario de creación de post
 function clearPostForm() {
     document.getElementById('postText').value = '';
     document.getElementById('imageInput').value = '';
@@ -245,7 +270,6 @@ function clearPostForm() {
     document.getElementById('privacy').value = 'Public';
 }
 
-// Función para entrar en modo de edición
 function setEditMode(post) {
     currentEditingPostId = post.post_id;
     const postTextarea = document.getElementById('postText');
@@ -254,16 +278,13 @@ function setEditMode(post) {
     const clearBtn = document.getElementById('clearBtn');
     const previewArea = document.getElementById('preview-area');
     
-    // Rellenar el formulario
     postTextarea.value = post.text_content;
     privacySelect.value = post.privacy;
     
-    // Cambiar el botón para el modo de actualización
     postBtn.textContent = 'Actualizar Post';
     postBtn.dataset.mode = 'update';
     if (clearBtn) clearBtn.style.display = 'none';
 
-    // Mostrar la previsualización del archivo o imagen actual
     previewArea.innerHTML = '';
     const API_URL = 'http://localhost:3000/';
     if (post.image_url) {
@@ -275,21 +296,17 @@ function setEditMode(post) {
     }
 }
 
-// Función para volver al modo de creación
 function setCreateMode() {
     currentEditingPostId = null;
     const postBtn = document.getElementById('postBtn');
     const clearBtn = document.getElementById('clearBtn');
 
-    // Restaurar el botón de POST
     postBtn.textContent = 'POST';
     postBtn.dataset.mode = 'create';
     if (clearBtn) clearBtn.style.display = 'inline-block';
     clearPostForm();
 }
 
-
-// Función principal de configuración de la página de posts
 export function setupPostPage() {
     const postBtn = document.getElementById('postBtn');
     const clearBtn = document.getElementById('clearBtn');

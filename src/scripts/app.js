@@ -14,6 +14,7 @@ const routes = {
     "/notifications": "/src/pages/notifications.page.html",
     "/profile": "/src/pages/profile.page.html",
     "/chats": "/src/pages/chats.page.html",
+    "/settings": "/src/pages/settings.page.html",
     "/profile-setup": "/src/pages/profile-setup.page.html"
 };
 
