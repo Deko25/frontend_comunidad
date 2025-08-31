@@ -27,11 +27,11 @@ function renderPost(post, currentProfileId) {
     }
 
     let privacyEmoji = '';
-    if (post.privacy === 'Public') {
+    if (post.privacy === 'Publico') {
         privacyEmoji = '🌍';
-    } else if (post.privacy === 'Friends') {
+    } else if (post.privacy === 'Amigos') {
         privacyEmoji = '👥';
-    } else if (post.privacy === 'Only Me') {
+    } else if (post.privacy === 'Solo yo') {
         privacyEmoji = '🔒';
     }
     
@@ -61,9 +61,11 @@ function renderPost(post, currentProfileId) {
     
     const commentsHtml = post.Comments.map(comment => `
         <div class="comment-item">
-            <img src="${comment.Profile.profile_photo || 'assets/default-user.png'}" alt="User Avatar" class="comment-avatar">
-            <div class="comment-content">
+            <div class="comment-profile">
+                <img src="${comment.Profile.profile_photo || 'assets/default-user.png'}" alt="User Avatar" class="comment-avatar">
                 <span class="comment-author">${comment.Profile.User.first_name} ${comment.Profile.User.last_name}</span>
+            </div>    
+            <div class="comment-content">
                 <p>${comment.content}</p>
             </div>
         </div>
@@ -85,17 +87,29 @@ function renderPost(post, currentProfileId) {
         </button>
     `;
 
+    // Lógica para renderizar el contenido de texto solo si existe
+    const textContentHtml = post.text_content && post.text_content.trim() !== '' 
+        ? `<p>${post.text_content}</p>` 
+        : '';
+
     postElement.innerHTML = `
         <div class="post-header">
-            <img src="${profilePhotoUrl}" alt="User Avatar" class="post-avatar">
+            
             <div class="post-info">
-                <span class="post-author">${authorName}</span>
-                <span class="post-date">${new Date(post.created_at).toLocaleDateString()}</span>
-                <span class="post-privacy">${privacyEmoji} ${post.privacy}</span>
+                <div class="post-auth-info">
+                    <img src="${profilePhotoUrl}" alt="User Avatar" class="post-avatar">
+                    <span class="post-author">${authorName}</span>
+                </div>
+                
+
+                <div class="post-details">
+                    <span class="post-date">${new Date(post.created_at).toLocaleDateString()}</span>
+                    <span class="post-privacy">${privacyEmoji} ${post.privacy}</span>
+                </div>
             </div>
         </div>
         <div class="post-content">
-            <p>${post.text_content}</p>
+            ${textContentHtml}
             ${mediaContent}
         </div>
         <div class="post-stats">
@@ -267,7 +281,7 @@ function clearPostForm() {
     document.getElementById('codeInput').value = '';
     document.getElementById('fileInput').value = '';
     document.getElementById('preview-area').innerHTML = '';
-    document.getElementById('privacy').value = 'Public';
+    document.getElementById('privacy').value = 'Publico';
 }
 
 function setEditMode(post) {
@@ -361,6 +375,12 @@ export function setupPostPage() {
         });
     }
 
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            clearPostForm();
+        });
+    }
+    
     setupFilePreview();
     updatePostCreatorProfilePhoto();
     fetchAndRenderPosts();
