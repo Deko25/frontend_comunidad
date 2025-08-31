@@ -4,7 +4,7 @@ let socket;
 let userId = null;
 
 export async function initChatSocket(_userId, chatIds = []) {
-  userId = _userId;
+  userId = Number(_userId);
   if (!window.io) {
     console.error('Socket.io client not loaded');
     return;
@@ -16,8 +16,7 @@ export async function initChatSocket(_userId, chatIds = []) {
     reconnectionDelayMax: 5000,
     timeout: 20000
   });
-  console.log('[SOCKET] Conectado, userId:', userId, 'chatIds:', chatIds);
-  socket.emit('joinChats', { userId, chatIds });
+  console.log('[SOCKET] Inicializando socket para userId:', userId, 'chatIds:', chatIds);
 
   socket.on('connect', () => {
     console.log('[SOCKET] Conexión establecida:', socket.id);
@@ -55,6 +54,12 @@ export async function initChatSocket(_userId, chatIds = []) {
 
   socket.on('user_offline', (userId) => {
     if (typeof window.onUserOffline === 'function') window.onUserOffline(userId);
+  });
+
+  socket.on('online_users', (userIds) => {
+    if (!Array.isArray(userIds)) return;
+    window.onlineUsers = userIds.map(id => Number(id));
+    if (typeof window.refreshOnlineUsers === 'function') window.refreshOnlineUsers();
   });
 }
 

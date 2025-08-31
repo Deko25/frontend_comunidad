@@ -36,11 +36,13 @@ async function renderConversationList(preserveSelection = true) {
     userListEl.innerHTML = '';
     if (!conversations.length) {
         userListEl.innerHTML = '<div>No hay conversaciones</div>';
-        return;
+    updateSelectedHeaderStatus();
+    return;
     }
     window.lastConversations = conversations;
     conversations.forEach(conv => {
-        const { chatId, otherUser, lastMessage, unreadCount } = conv;
+        const chatId = conv.chatId || conv.chat_id; // backend devuelve chat_id
+        const { otherUser, lastMessage, unreadCount } = conv;
         if (otherUser) chatMap.set(chatId, otherUser.user_id);
         const el = document.createElement('div');
         el.className = 'conversation-item';
@@ -65,11 +67,13 @@ async function renderConversationList(preserveSelection = true) {
         }
         userListEl.appendChild(el);
     });
+    updateSelectedHeaderStatus();
 }
 
 function selectConversation(conv) {
     if (!conv) return;
-    const { otherUser, chatId } = conv;
+    const chatId = conv.chatId || conv.chat_id;
+    const { otherUser } = conv;
     // Simular antigua estructura user para reutilizar selectUser
     if (otherUser) {
         selectUser(otherUser, chatId);
@@ -77,7 +81,10 @@ function selectConversation(conv) {
 }
 
 window.onUserOnline = (userId) => {
+    userId = Number(userId);
+    if (!Array.isArray(window.onlineUsers)) window.onlineUsers = [];
     if (!window.onlineUsers.includes(userId)) window.onlineUsers.push(userId);
+    console.log('[ONLINE] user_online recibido', userId, 'lista:', window.onlineUsers);
     if (selectedUser && selectedUser.user_id === userId) {
         const chatUserInfoEl = document.querySelector('.chat-user-info');
         if (chatUserInfoEl) chatUserInfoEl.querySelector('p').textContent = '🟢 Online';
@@ -86,13 +93,30 @@ window.onUserOnline = (userId) => {
 };
 
 window.onUserOffline = (userId) => {
-    window.onlineUsers = window.onlineUsers.filter(id => id !== userId);
+    userId = Number(userId);
+    window.onlineUsers = (window.onlineUsers || []).filter(id => id !== userId);
+    console.log('[ONLINE] user_offline recibido', userId, 'lista:', window.onlineUsers);
     if (selectedUser && selectedUser.user_id === userId) {
         const chatUserInfoEl = document.querySelector('.chat-user-info');
         if (chatUserInfoEl) chatUserInfoEl.querySelector('p').textContent = '⚪ Offline';
     }
     renderConversationList();
 };
+
+// Re-render for bulk update (initial online_users list)
+window.refreshOnlineUsers = () => {
+    renderConversationList();
+    // actualizar header si hay usuario seleccionado
+    updateSelectedHeaderStatus();
+};
+
+function updateSelectedHeaderStatus(){
+    if (!selectedUser) return;
+    const chatUserInfoEl = document.querySelector('.chat-user-info');
+    if (!chatUserInfoEl) return;
+    const onlineStatus = (window.onlineUsers || []).includes(Number(selectedUser.user_id)) ? '🟢 Online' : '⚪ Offline';
+    chatUserInfoEl.innerHTML = `<h3>${selectedUser.first_name} ${selectedUser.last_name}</h3><p>${onlineStatus}</p>`;
+}
 
 
 // Seleccionar usuario y cargar historial
@@ -103,7 +127,7 @@ async function selectUser(user, preChatId = null) {
     // Mostrar el avatar y el estado online/offline del usuario seleccionado en el chat
     const chatUserInfoEl = document.querySelector('.chat-user-info');
     const chatUserAvatarEl = document.querySelector('.chat-user-avatar');
-    const avatarUrl = user.profile_photo || './src/images/default-avatar.png';
+    const avatarUrl = user.profile_photo || user.Profile?.profile_photo || './src/images/default-avatar.png';
     if (chatUserAvatarEl) {
         chatUserAvatarEl.innerHTML = `<img src="${avatarUrl}" alt="${user.first_name}" style="width:50px;height:50px;border-radius:50%;object-fit:cover;">`;
     }
@@ -202,7 +226,7 @@ sendBtnEl.onclick = async () => {
         // Actualizar cache local sin refetch completo
         let cacheEntry = messageCache.get(selectedUser.user_id);
         if (!cacheEntry) {
-            cacheEntry = { messages: [], hasMore: false, oldestTs: null, chatId: currentChatId, otherUser: { first_name: selectedUser.first_name } };
+            cacheEntry = { messages: [], hasMore: false, oldestTs: null, chatId: currentChatId, otherUser: { first_name: selectedUser.first_name, last_name: selectedUser.last_name, profile_photo: selectedUser.profile_photo } };
             messageCache.set(selectedUser.user_id, cacheEntry);
         }
         cacheEntry.messages.push(msg);
@@ -244,7 +268,7 @@ window.onNewMessage = (msg) => {
         // Append sin refetch
         let cacheEntry = messageCache.get(selectedUser.user_id);
         if (!cacheEntry) {
-            cacheEntry = { messages: [], hasMore: false, oldestTs: null, chatId: msg.chat_id, otherUser: { first_name: selectedUser.first_name } };
+            cacheEntry = { messages: [], hasMore: false, oldestTs: null, chatId: msg.chat_id, otherUser: { first_name: selectedUser.first_name, last_name: selectedUser.last_name, profile_photo: selectedUser.profile_photo } };
             messageCache.set(selectedUser.user_id, cacheEntry);
         }
         // Evitar duplicados (por si vino por fetch y socket casi a la vez)
@@ -331,14 +355,33 @@ function renderMessages(cacheEntry, otherUserId, append = false) {
     messages.forEach(msg => {
         if (chatMessagesEl.querySelector(`[data-mid="${msg.message_id}"]`)) return; // ya dibujado
         const isOwn = msg.user_id === currentUser.user_id;
-        const el = document.createElement('div');
-        el.dataset.mid = msg.message_id || `${msg.chat_id}-${msg.sent_date}-${msg.user_id}`;
-        el.className = isOwn ? 'message sent' : 'message received';
+        const row = document.createElement('div');
+        row.dataset.mid = msg.message_id || `${msg.chat_id}-${msg.sent_date}-${msg.user_id}`;
+        row.className = 'msg-row ' + (isOwn ? 'sent' : 'received');
+        const bubble = document.createElement('div');
+        bubble.className = 'message ' + (isOwn ? 'sent' : 'received');
         const ts = new Date(msg.sent_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const readMark = isOwn ? (msg.read_at ? '<span class="tick-read">✓✓</span>' : '<span class="tick-delivered">✓</span>') : '';
         const author = isOwn ? 'Tú' : (otherUser ? otherUser.first_name : '');
-        el.innerHTML = `<span class="msg-content"><strong>${author ? author + ': ' : ''}</strong>${msg.content}</span><span class="msg-meta">${ts} ${readMark}</span>`;
-        fragment.appendChild(el);
+        const otherAvatar = otherUser && otherUser.profile_photo ? otherUser.profile_photo : './src/images/default-avatar.png';
+        const selfAvatar = currentUser.profile_photo || currentUser.Profile?.profile_photo || './src/images/default-avatar.png';
+        bubble.innerHTML = `<span class="msg-content"><strong>${author ? author + ': ' : ''}</strong>${msg.content}</span><span class="msg-meta">${ts} ${readMark}</span>`;
+        if (isOwn) {
+            const avatar = document.createElement('img');
+            avatar.src = selfAvatar;
+            avatar.alt = 'Tú';
+            avatar.className = 'msg-avatar self';
+            row.appendChild(bubble);
+            row.appendChild(avatar);
+        } else {
+            const avatar = document.createElement('img');
+            avatar.src = otherAvatar;
+            avatar.alt = author || 'Usuario';
+            avatar.className = 'msg-avatar';
+            row.appendChild(avatar);
+            row.appendChild(bubble);
+        }
+        fragment.appendChild(row);
     });
     chatMessagesEl.appendChild(fragment);
     if (append && !wasAtBottom) {

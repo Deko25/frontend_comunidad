@@ -365,6 +365,23 @@ body {
     line-height: 1.4;
 }
 
+.msg-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+}
+.msg-row.sent { justify-content: flex-end; }
+.msg-row.received { justify-content: flex-start; }
+
+.msg-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 0 2px #fff;
+}
+.msg-avatar.self { order: 2; }
+
 .message.received {
     background: #f0f0f0;
     color: #333;
