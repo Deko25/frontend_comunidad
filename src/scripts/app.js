@@ -212,4 +212,5 @@ document.addEventListener("DOMContentLoaded", () => {
     navigate(location.pathname, false);
 });
 
-export { navigate };
+export { navigate }; 
+
