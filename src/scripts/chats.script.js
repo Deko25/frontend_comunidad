@@ -9,6 +9,7 @@ let selectedUser = null;
 let currentChatId = null;
 let chatIds = [];
 let chatReady = false;
+const messageCache = new Map(); // key: otherUserId, value: { messages: [], hasMore, oldestTs, chatId }
 
 const userListEl = document.getElementById('user-list');
 const chatMessagesEl = document.getElementById('chat-messages');
@@ -16,38 +17,63 @@ const chatInputEl = document.getElementById('chat-input');
 const sendBtnEl = document.getElementById('send-btn');
 const typingIndicatorEl = document.getElementById('typing-indicator');
 
-// Renderizar lista de usuarios disponibles
-async function renderUserList() {
-    console.log('renderUserList ejecutado');
+// Mapa chatId -> otherUserId para actualizaciones rápidas
+const chatMap = new Map();
+
+// Renderizar lista de conversaciones (sustituye lista de usuarios sueltos)
+async function renderConversationList(preserveSelection = true) {
+    const prevSelectedId = preserveSelection && selectedUser ? selectedUser.user_id : null;
     const token = localStorage.getItem('token');
-    const res = await fetch(`${API_URL}/chat/users`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-    });
-    const users = await res.json();
-    console.log('Usuarios recibidos:', users);
-    if (!userListEl) {
-        console.error('No se encontró el elemento #user-list en el HTML');
+    let conversations = [];
+    try {
+        const res = await fetch(`${API_URL}/chat/conversations`, { headers: { 'Authorization': `Bearer ${token}` } });
+        conversations = await res.json();
+    } catch (e) {
+        console.error('Error obteniendo conversaciones:', e);
+    }
+    if (!Array.isArray(conversations)) conversations = [];
+    if (!userListEl) return;
+    userListEl.innerHTML = '';
+    if (!conversations.length) {
+        userListEl.innerHTML = '<div>No hay conversaciones</div>';
         return;
     }
-    userListEl.innerHTML = '';
-    if (users.length === 0) {
-        userListEl.innerHTML = '<div>No hay usuarios disponibles para chatear.</div>';
-    } else {
-        users.forEach(user => {
-            const el = document.createElement('div');
-            el.className = 'user-item';
-            const avatarUrl = user.profile_photo || './src/images/default-avatar.png';
-            let onlineStatus = window.onlineUsers && window.onlineUsers.includes(user.user_id) ? '🟢' : '⚪';
-            el.innerHTML = `
-                <img src="${avatarUrl}" alt="${user.first_name}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;margin-right:8px;vertical-align:middle;">
-                <span>${user.first_name} ${user.last_name}</span>
-                <span style="float:right;">${onlineStatus}</span>
-            `;
-            el.onclick = () => selectUser(user);
-            userListEl.appendChild(el);
-        });
+    window.lastConversations = conversations;
+    conversations.forEach(conv => {
+        const { chatId, otherUser, lastMessage, unreadCount } = conv;
+        if (otherUser) chatMap.set(chatId, otherUser.user_id);
+        const el = document.createElement('div');
+        el.className = 'conversation-item';
+        el.dataset.chatId = chatId;
+        el.dataset.uid = otherUser ? otherUser.user_id : '';
+        const avatarUrl = (otherUser && otherUser.profile_photo) || './src/images/default-avatar.png';
+        const onlineStatus = window.onlineUsers && otherUser ? (window.onlineUsers.includes(otherUser.user_id) ? '🟢' : '⚪') : '';
+        const time = lastMessage ? new Date(lastMessage.sent_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+        const snippetRaw = lastMessage ? lastMessage.content : '';
+        const snippet = snippetRaw.length > 40 ? snippetRaw.slice(0, 37) + '…' : snippetRaw;
+        el.innerHTML = `
+            <img src="${avatarUrl}" alt="${otherUser ? otherUser.first_name : ''}" class="conv-avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+            <div class="conv-main">
+               <div class="conv-top"><span class="conv-name">${otherUser ? otherUser.first_name + ' ' + otherUser.last_name : 'Desconocido'}</span><span class="conv-time">${time}</span></div>
+               <div class="conv-bottom"><span class="conv-last">${snippet}</span>${unreadCount ? `<span class="unread-badge">${unreadCount}</span>` : ''}</div>
+            </div>
+            <span class="conv-status">${onlineStatus}</span>
+        `;
+        el.onclick = () => selectConversation(conv);
+        if (prevSelectedId && otherUser && otherUser.user_id === prevSelectedId) {
+            el.classList.add('active');
+        }
+        userListEl.appendChild(el);
+    });
+}
+
+function selectConversation(conv) {
+    if (!conv) return;
+    const { otherUser, chatId } = conv;
+    // Simular antigua estructura user para reutilizar selectUser
+    if (otherUser) {
+        selectUser(otherUser, chatId);
     }
-    window.lastUserList = users;
 }
 
 window.onUserOnline = (userId) => {
@@ -56,7 +82,7 @@ window.onUserOnline = (userId) => {
         const chatUserInfoEl = document.querySelector('.chat-user-info');
         if (chatUserInfoEl) chatUserInfoEl.querySelector('p').textContent = '🟢 Online';
     }
-    actualizarListaOnlineOffline();
+    renderConversationList();
 };
 
 window.onUserOffline = (userId) => {
@@ -65,26 +91,12 @@ window.onUserOffline = (userId) => {
         const chatUserInfoEl = document.querySelector('.chat-user-info');
         if (chatUserInfoEl) chatUserInfoEl.querySelector('p').textContent = '⚪ Offline';
     }
-    actualizarListaOnlineOffline();
+    renderConversationList();
 };
-
-function actualizarListaOnlineOffline() {
-    const userItems = document.querySelectorAll('.user-item');
-    userItems.forEach(item => {
-        const nameSpan = item.querySelector('span');
-        const userName = nameSpan ? nameSpan.textContent.trim() : '';
-        const user = window.lastUserList && window.lastUserList.find(u => `${u.first_name} ${u.last_name}` === userName);
-        if (user) {
-            const onlineStatus = window.onlineUsers && window.onlineUsers.includes(user.user_id) ? '🟢' : '⚪';
-            const statusSpan = item.querySelector('span:last-child');
-            if (statusSpan) statusSpan.textContent = onlineStatus;
-        }
-    });
-}
 
 
 // Seleccionar usuario y cargar historial
-async function selectUser(user) {
+async function selectUser(user, preChatId = null) {
     selectedUser = user;
     chatReady = false;
     setSendEnabled(false);
@@ -100,10 +112,17 @@ async function selectUser(user) {
         chatUserInfoEl.innerHTML = `<h3>${user.first_name} ${user.last_name}</h3><p>${onlineStatus}</p>`;
     }
     // Hardening: asegurar el chatId vía REST antes de cargar historial o permitir mensajes
-    await ensureChat(currentUser.user_id, user.user_id);
+    if (preChatId) { // si ya conocemos el chat de la conversación
+        currentChatId = preChatId;
+        chatReady = true;
+        setSendEnabled(true);
+    } else {
+        await ensureChat(currentUser.user_id, user.user_id);
+    }
     if (chatReady && currentChatId) {
         joinChatRoom(currentChatId);
         await fetchMessagesForCurrentChat(user);
+        markConversationReadInUI(currentChatId);
     }
 }
 
@@ -138,19 +157,26 @@ async function ensureChat(fromUserId, toUserId) {
 }
 
 async function fetchMessagesForCurrentChat(user = selectedUser) {
-    chatMessagesEl.innerHTML = '';
+    if (!user) return;
     const token = localStorage.getItem('token');
-    const res = await fetch(`${API_URL}/chat/messages/${user.user_id}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-    });
-    const messages = await res.json();
-    // No modificar currentChatId aquí, solo mostrar mensajes
-    messages.forEach(msg => {
-        const el = document.createElement('div');
-        el.className = msg.user_id === currentUser.user_id ? 'message sent' : 'message received';
-        el.textContent = msg.content;
-        chatMessagesEl.appendChild(el);
-    });
+    let cacheEntry = messageCache.get(user.user_id);
+    if (!cacheEntry) {
+        // Primera carga
+        const res = await fetch(`${API_URL}/chat/messages/${user.user_id}?limit=30`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        const messages = Array.isArray(data) ? data : data.messages || [];
+        cacheEntry = {
+            messages,
+            hasMore: !Array.isArray(data) ? data.hasMore : false,
+            oldestTs: messages.length ? messages[0].sent_date : null,
+            chatId: !Array.isArray(data) ? data.chatId : null,
+            otherUser: !Array.isArray(data) ? data.otherUser : null
+        };
+        messageCache.set(user.user_id, cacheEntry);
+    }
+    renderMessages(cacheEntry, user.user_id);
+    currentChatId = cacheEntry.chatId || currentChatId;
+    if (currentChatId) markChatRead(currentChatId);
 }
 
 
@@ -158,7 +184,6 @@ async function fetchMessagesForCurrentChat(user = selectedUser) {
 sendBtnEl.onclick = async () => {
     const content = chatInputEl.value.trim();
     if (!content || !selectedUser) return;
-    // Hardening: bloquear envío si no hay chatId válido
     if (!chatReady || !currentChatId) {
         alert('No se puede enviar el mensaje: chatId no disponible');
         return;
@@ -174,8 +199,18 @@ sendBtnEl.onclick = async () => {
             body: JSON.stringify({ toUserId: selectedUser.user_id, content })
         });
         const msg = await res.json();
-        await fetchMessagesForCurrentChat(selectedUser);
+        // Actualizar cache local sin refetch completo
+        let cacheEntry = messageCache.get(selectedUser.user_id);
+        if (!cacheEntry) {
+            cacheEntry = { messages: [], hasMore: false, oldestTs: null, chatId: currentChatId, otherUser: { first_name: selectedUser.first_name } };
+            messageCache.set(selectedUser.user_id, cacheEntry);
+        }
+        cacheEntry.messages.push(msg);
+        renderMessages(cacheEntry, selectedUser.user_id, true);
+        // Emitir por socket (optimista)
         sendMessage(currentChatId, selectedUser.user_id, content);
+        // Refrescar lista conversaciones para mover esta arriba
+        renderConversationList();
     } catch (e) {
         alert('Error enviando el mensaje: ' + (e.message || e));
     }
@@ -201,12 +236,27 @@ window.onNewMessage = (msg) => {
     // Actualizar el chatId siempre que llegue un mensaje
     if (msg.chat_id && msg.chat_id !== currentChatId) {
         currentChatId = msg.chat_id;
+    // Rejoin explícito por si llegó un chat nuevo tras reconexión
+    joinChatRoom(currentChatId);
     }
     // Si el mensaje es del usuario seleccionado o del usuario actual
     if (selectedUser && (msg.user_id === selectedUser.user_id || msg.user_id === currentUser.user_id)) {
-        // Refrescar historial de mensajes siempre que llegue un mensaje
-        fetchMessagesForCurrentChat();
+        // Append sin refetch
+        let cacheEntry = messageCache.get(selectedUser.user_id);
+        if (!cacheEntry) {
+            cacheEntry = { messages: [], hasMore: false, oldestTs: null, chatId: msg.chat_id, otherUser: { first_name: selectedUser.first_name } };
+            messageCache.set(selectedUser.user_id, cacheEntry);
+        }
+        // Evitar duplicados (por si vino por fetch y socket casi a la vez)
+        if (!cacheEntry.messages.find(m => m.message_id === msg.message_id && msg.message_id)) {
+            cacheEntry.messages.push(msg);
+        }
+        renderMessages(cacheEntry, selectedUser.user_id, true);
+        markChatRead(currentChatId);
+        markConversationReadInUI(currentChatId);
     }
+    // Refrescar lista de conversaciones para actualizar snippet y contador
+    renderConversationList();
 };
 
 window.onTyping = (userId) => {
@@ -239,5 +289,98 @@ window.onTyping = (userId) => {
         console.error('Error obteniendo chat ids:', e);
     }
     initChatSocket(userId, chatIds);
-    renderUserList();
+    renderConversationList();
 })();
+
+// Reconexión exponencial simple para socket (si se pierde window.io conexión)
+let reconnectAttempts = 0;
+function scheduleReconnect(userId, chatIds) {
+    const delay = Math.min(30000, 1000 * Math.pow(2, reconnectAttempts));
+    setTimeout(() => {
+        reconnectAttempts++;
+        initChatSocket(userId, chatIds);
+    }, delay);
+}
+
+// Hook básico (sobrescribe initChatSocket para añadir listeners de reconexión si se quiere extender)
+
+function renderMessages(cacheEntry, otherUserId, append = false) {
+    const { messages, otherUser } = cacheEntry;
+    const wasAtBottom = Math.abs(chatMessagesEl.scrollHeight - chatMessagesEl.scrollTop - chatMessagesEl.clientHeight) < 50;
+    if (!append) {
+        chatMessagesEl.innerHTML = '';
+        if (cacheEntry.hasMore) {
+            const loadMoreBtn = document.createElement('button');
+            loadMoreBtn.textContent = 'Cargar más';
+            loadMoreBtn.className = 'load-more-btn';
+            loadMoreBtn.onclick = () => loadOlderMessages(otherUserId);
+            chatMessagesEl.appendChild(loadMoreBtn);
+        }
+    } else {
+        // Actualizar botón load more (si recién se creó)
+        const existingBtn = chatMessagesEl.querySelector('.load-more-btn');
+        if (!existingBtn && cacheEntry.hasMore) {
+            const loadMoreBtn = document.createElement('button');
+            loadMoreBtn.textContent = 'Cargar más';
+            loadMoreBtn.className = 'load-more-btn';
+            loadMoreBtn.onclick = () => loadOlderMessages(otherUserId);
+            chatMessagesEl.insertBefore(loadMoreBtn, chatMessagesEl.firstChild);
+        }
+    }
+    const fragment = document.createDocumentFragment();
+    messages.forEach(msg => {
+        if (chatMessagesEl.querySelector(`[data-mid="${msg.message_id}"]`)) return; // ya dibujado
+        const isOwn = msg.user_id === currentUser.user_id;
+        const el = document.createElement('div');
+        el.dataset.mid = msg.message_id || `${msg.chat_id}-${msg.sent_date}-${msg.user_id}`;
+        el.className = isOwn ? 'message sent' : 'message received';
+        const ts = new Date(msg.sent_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const readMark = isOwn ? (msg.read_at ? '<span class="tick-read">✓✓</span>' : '<span class="tick-delivered">✓</span>') : '';
+        const author = isOwn ? 'Tú' : (otherUser ? otherUser.first_name : '');
+        el.innerHTML = `<span class="msg-content"><strong>${author ? author + ': ' : ''}</strong>${msg.content}</span><span class="msg-meta">${ts} ${readMark}</span>`;
+        fragment.appendChild(el);
+    });
+    chatMessagesEl.appendChild(fragment);
+    if (append && !wasAtBottom) {
+        // No forzar scroll si el usuario está revisando mensajes viejos
+    } else {
+        chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+    }
+}
+
+async function loadOlderMessages(otherUserId) {
+    const cacheEntry = messageCache.get(otherUserId);
+    if (!cacheEntry || !cacheEntry.hasMore) return;
+    const token = localStorage.getItem('token');
+    const before = encodeURIComponent(cacheEntry.oldestTs);
+    const res = await fetch(`${API_URL}/chat/messages/${otherUserId}?limit=30&before=${before}`, { headers: { 'Authorization': `Bearer ${token}` } });
+    const data = await res.json();
+    const older = Array.isArray(data) ? data : data.messages || [];
+    if (older.length) {
+        cacheEntry.messages = [...older, ...cacheEntry.messages];
+        cacheEntry.oldestTs = cacheEntry.messages[0].sent_date;
+        cacheEntry.hasMore = !Array.isArray(data) ? data.hasMore : false;
+        // Re-render completo conservando scroll relativo
+        const prevHeight = chatMessagesEl.scrollHeight;
+        renderMessages(cacheEntry, otherUserId);
+        const newHeight = chatMessagesEl.scrollHeight;
+        chatMessagesEl.scrollTop = newHeight - prevHeight; // mantener posición
+    } else {
+        cacheEntry.hasMore = false;
+        renderMessages(cacheEntry, otherUserId);
+    }
+}
+
+async function markChatRead(chatId) {
+    const token = localStorage.getItem('token');
+    try { await fetch(`${API_URL}/chat/read/${chatId}`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } }); } catch {}
+}
+
+function markConversationReadInUI(chatId){
+    if(!chatId) return;
+    const el = userListEl.querySelector(`.conversation-item[data-chat-id="${chatId}"]`);
+    if(el){
+        const badge = el.querySelector('.unread-badge');
+        if(badge) badge.remove();
+    }
+}

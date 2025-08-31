@@ -9,12 +9,36 @@ export async function initChatSocket(_userId, chatIds = []) {
     console.error('Socket.io client not loaded');
     return;
   }
-  socket = window.io('http://localhost:3000');
+  socket = window.io('http://localhost:3000', {
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 500,
+    reconnectionDelayMax: 5000,
+    timeout: 20000
+  });
   console.log('[SOCKET] Conectado, userId:', userId, 'chatIds:', chatIds);
   socket.emit('joinChats', { userId, chatIds });
 
   socket.on('connect', () => {
     console.log('[SOCKET] Conexión establecida:', socket.id);
+    socket.emit('joinChats', { userId, chatIds });
+  });
+
+  socket.on('disconnect', (reason) => {
+    console.warn('[SOCKET] Desconectado:', reason);
+  });
+
+  socket.io.on('reconnect_attempt', (attempt) => {
+    console.log('[SOCKET] Intento de reconexión #' + attempt);
+  });
+
+  socket.io.on('reconnect', (attempt) => {
+    console.log('[SOCKET] Reconexion exitosa tras intentos:', attempt);
+    socket.emit('joinChats', { userId, chatIds });
+  });
+
+  socket.io.on('reconnect_failed', () => {
+    console.error('[SOCKET] Reconexión fallida definitivamente.');
   });
 
   socket.on('new_message', (message) => {
