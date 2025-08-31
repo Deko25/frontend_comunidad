@@ -205,7 +205,7 @@ function runPageScripts(pathname) {
         import('./chats.script.js');
     } else if (pathname === '/settings') {
         setupSettingsPage(navigate); 
-
+    }
 }
 
 document.body.addEventListener("click", (e) => {
