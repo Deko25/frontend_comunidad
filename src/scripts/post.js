@@ -35,7 +35,6 @@ function renderPost(post, currentProfileId) {
         privacyEmoji = '🔒';
     }
     
-    // --- Lógica del menú de hamburguesa ---
     let actionButtons = '';
     if (post.profile_id === currentProfileId) {
         actionButtons = `
@@ -70,24 +69,33 @@ function renderPost(post, currentProfileId) {
             </div>
         </div>
     `).join('');
+
+    const reactionTranslations = {
+        'like': 'Me gusta',
+        'love': 'Me encanta',
+        'laugh': 'Me divierte',
+        'angry': 'Me enoja'
+    };
     
     let mainReactionButtonHtml = '';
     let mainReactionEmoji = '👍';
+    let mainReactionText = 'Me gusta';
+
     if (userReactionType) {
         if (userReactionType === 'like') mainReactionEmoji = '👍';
         if (userReactionType === 'love') mainReactionEmoji = '❤️';
         if (userReactionType === 'laugh') mainReactionEmoji = '😂';
         if (userReactionType === 'angry') mainReactionEmoji = '😡';
+        mainReactionText = reactionTranslations[userReactionType] || 'Me gusta';
     }
     
     mainReactionButtonHtml = `
         <button class="main-reaction-btn reaction-btn" data-post-id="${post.post_id}" data-reaction-type="${userReactionType || 'like'}">
             <span class="icon">${mainReactionEmoji}</span>
-            <span>${userReactionType || 'Me gusta'}</span>
+            <span>${mainReactionText}</span>
         </button>
     `;
 
-    // Lógica para renderizar el contenido de texto solo si existe
     const textContentHtml = post.text_content && post.text_content.trim() !== '' 
         ? `<p>${post.text_content}</p>` 
         : '';
@@ -145,18 +153,39 @@ function renderPost(post, currentProfileId) {
         </div>
     `;
 
-    // --- MANEJADORES DE EVENTOS ---
-
     const deleteBtn = postElement.querySelector('.delete-btn');
     if (deleteBtn) {
         deleteBtn.addEventListener('click', async () => {
-            if (confirm('¿Estás seguro de que quieres eliminar esta publicación?')) {
+        const result = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'No podrás revertir esto.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#705FFF',
+            cancelButtonColor: '#f2f3f5',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            customClass: {
+                cancelButton: 'cancel-btn-class'
+            }
+        });
+
+            if (result.isConfirmed) {
                 try {
                     await deletePost(post.post_id);
+                    Swal.fire(
+                        '¡Eliminado!',
+                        'Tu publicación ha sido eliminada.',
+                        'success'
+                    );
                     fetchAndRenderPosts();
                 } catch (error) {
                     console.error('Error al eliminar el post:', error);
-                    alert('No se pudo eliminar la publicación.');
+                    Swal.fire(
+                        'Error',
+                        'No se pudo eliminar la publicación.',
+                        'error'
+                    );
                 }
             }
         });
@@ -333,12 +362,25 @@ export function setupPostPage() {
             const privacy = privacySelect.value;
             const formData = new FormData();
 
-            formData.append('text_content', postContent);
-            formData.append('privacy', privacy);
-
             const imageInput = document.getElementById('imageInput');
             const codeInput = document.getElementById('codeInput');
             const fileInput = document.getElementById('fileInput');
+            
+            // --- Lógica de Validación de Contenido ---
+            const hasText = postContent.trim().length > 0;
+            const hasFile = imageInput.files.length > 0 || codeInput.files.length > 0 || fileInput.files.length > 0;
+
+            if (!hasText && !hasFile) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Contenido vacío',
+                    text: 'Debes escribir algo o adjuntar un archivo para crear una publicación.'
+                });
+                return; // Detiene la ejecución
+            }
+
+            formData.append('text_content', postContent);
+            formData.append('privacy', privacy);
 
             if (imageInput.files.length > 0) {
                 formData.append('postFile', imageInput.files[0]);
@@ -356,21 +398,20 @@ export function setupPostPage() {
                 let postResponse;
                 if (postBtn.dataset.mode === 'update') {
                     postResponse = await updatePost(currentEditingPostId, formData);
-                    console.log('Post actualizado con éxito', postResponse);
+                    Swal.fire('¡Actualizado!', 'Tu publicación ha sido actualizada.', 'success');
                     setCreateMode();
                 } else {
                     postResponse = await createPost(formData);
-                    console.log('Post creado con éxito', postResponse);
                     clearPostForm();
-                }
-                console.log('Respuesta del post:', postResponse);
-                if (postResponse && postResponse.image_url) {
-                    console.log('URL de imagen subida:', postResponse.image_url);
                 }
                 fetchAndRenderPosts();
             } catch (err) {
                 console.error('Error al procesar el post:', err);
-                alert('Error al procesar el post: ' + (err.message || 'Inténtalo de nuevo.'));
+                Swal.fire(
+                    'Error',
+                    'Ocurrió un error al procesar la publicación. ' + (err.message || 'Inténtalo de nuevo.'),
+                    'error'
+                );
             }
         });
     }

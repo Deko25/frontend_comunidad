@@ -249,6 +249,10 @@ body {
   color: #000;
 }
 
+.cancel-btn-class{
+  color: #000;
+}
+
 /* Original delete-btn and edit-btn are no longer needed as they are handled by the menu */
 /*
 .delete-btn {
@@ -909,3 +913,4 @@ body {
         font-size: 20px;
     }
 }
+
