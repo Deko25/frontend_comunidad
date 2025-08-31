@@ -1,5 +1,6 @@
 // Renderizar una notificación individual
 export function renderNotification(notification) {
+    console.log('Notificación recibida:', notification);
     const container = document.querySelector('.notifications-container');
     if (!container) return;
     const API_URL = 'http://localhost:3000/';
@@ -22,13 +23,10 @@ export function renderNotification(notification) {
             message = notification.message || 'Tienes una nueva notificación';
     }
 
-    let profilePhoto = notification.profile_photo || './src/images/default-avatar.png';
-    if (profilePhoto === './src/images/default-avatar.png') {
-        const userAvatarImg = document.querySelector('.user-avatar img');
-        if (userAvatarImg && userAvatarImg.src) {
-            profilePhoto = userAvatarImg.src;
-        }
-    }
+    let profilePhoto = notification.post?.Profile?.profile_photo
+        || notification.post?.profile_photo
+        || notification.Profile?.profile_photo
+        || './src/images/default-avatar.png';
 
     card.innerHTML = `
     <img src="${profilePhoto}" alt="${notification.user_name || 'Usuario'}" class="avatar">
