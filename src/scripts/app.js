@@ -201,15 +201,11 @@ function runPageScripts(pathname) {
         setupPostPage(navigate);
     } else if (pathname === '/profile-setup') {
         setupProfileForm(navigate);
-
-
-
-
-
-        
+    } else if (pathname === '/chats') {
+        import('./chats.script.js');
     } else if (pathname === '/settings') {
         setupSettingsPage(navigate); 
-    }
+
 }
 
 document.body.addEventListener("click", (e) => {
