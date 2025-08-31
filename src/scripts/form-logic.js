@@ -1,7 +1,6 @@
-// src/scripts/form-logic.js
 import axios from 'axios';
 import { login, register } from '../services/auth.js';
-import { createProfile } from '../services/profile.service.js';
+import { createProfile, getProfileData } from '../services/profile.service.js';
 
 // Nuevo servicio para obtener los roles
 const API_URL = 'http://localhost:3000';
@@ -65,17 +64,17 @@ export function setupLoginForm(navigate) {
         // Redirección con navigate para evitar recargar la página
         navigate('/home'); 
         } catch (err) {
-        // Manejo de errores en el front
-        const errorDiv = document.getElementById('loginError');
-        if (errorDiv) errorDiv.textContent = err.message || 'Error de autenticación';
-        alert(err.message || 'Error de autenticación');
+            // Manejo de errores con Swal.fire
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de autenticación',
+                text: err.message || 'Credenciales inválidas. Intenta de nuevo.'
+            });
         }
     };
 
     const registerLink = document.querySelector('.form-options .link[data-link]');
     if (registerLink) {
-        // El enrutador ya maneja el clic, no necesitas un `onclick` adicional
-        // Solo asegúrate de que el HTML tenga `data-link` en el enlace
     }
 }
 
@@ -91,7 +90,11 @@ export function setupRegisterForm(navigate) {
         
         const roleId = form['role-select'].value;
         if (!roleId) {
-            alert('Por favor, selecciona un tipo de usuario.');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Advertencia',
+                text: 'Por favor, selecciona un tipo de usuario.'
+            });
             return;
         }
 
@@ -105,27 +108,52 @@ export function setupRegisterForm(navigate) {
         
         try {
             await register(userData);
+            await Swal.fire({
+                icon: 'success',
+                title: 'Registro exitoso',
+                text: '¡Por favor, inicia sesión para continuar!'
+            });
             navigate('/login');
-            alert('¡Registro exitoso! Por favor, inicia sesión.');
         } catch (err) {
-            const errorDiv = document.getElementById('registerError');
-            if (errorDiv) errorDiv.textContent = err.message || 'Error de registro';
-            alert(err.message || 'Error de registro');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de registro',
+                text: err.message || 'Ocurrió un error. Intenta de nuevo.'
+            });
         }
     };
     
     const loginLink = document.querySelector('.login-link .link[data-link]');
     if (loginLink) {
-        // El enrutador ya maneja el clic
     }
 }
 
-export function setupProfileForm(navigate) {
+export async function setupProfileForm(navigate) { // <-- La función ahora es asíncrona
     const form = document.getElementById('profile-form');
     const photoInput = document.getElementById('photoInput');
     const previewImage = document.getElementById('previewImage');
+    const bioTextarea = document.getElementById('bio');
+    const submitButton = form.querySelector('button[type="submit"]');
 
     if (!form) return;
+
+
+    try {
+        const profile = await getProfileData();
+        if (profile) {
+            // Rellena el formulario con los datos existentes
+            bioTextarea.value = profile.bio || '';
+            if (profile.profile_photo) {
+                previewImage.src = profile.profile_photo;
+                previewImage.style.display = 'block';
+            }
+            // Cambia el texto del botón
+            submitButton.textContent = 'ACTUALIZAR PERFIL';
+        }
+    } catch (error) {
+        console.error('No se pudo cargar el perfil, asumiendo que es un perfil nuevo.');
+        
+    }
 
     // Vista previa de la foto de perfil
     photoInput.onchange = (e) => {
@@ -144,7 +172,7 @@ export function setupProfileForm(navigate) {
         e.preventDefault();
 
         const formData = new FormData();
-        formData.append('bio', form.bio.value);
+        formData.append('bio', bioTextarea.value);
 
         if (photoInput.files[0]) {
             formData.append('profilePhoto', photoInput.files[0]);
@@ -152,13 +180,18 @@ export function setupProfileForm(navigate) {
 
         try {
             await createProfile(formData);
-            localStorage.setItem('profileExists', 'true');
             navigate('/home');
-            alert('¡Perfil creado exitosamente! Redirigiendo a tu página principal.');
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: '¡Perfil guardado exitosamente!'
+            });
         } catch (err) {
-            const errorDiv = document.getElementById('profileError');
-            if (errorDiv) errorDiv.textContent = err.message || 'Error al crear el perfil';
-            alert(err.message || 'Error al crear el perfil');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: err.message || 'Error al guardar el perfil.'
+            });
         }
     };
 }
