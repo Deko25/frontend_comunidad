@@ -1,39 +1,45 @@
-<link rel="stylesheet" href="/src/styles/pages.style/settings.css">
+<link rel="stylesheet" href="./src/styles/global.style.css">
+<link rel="stylesheet" href="./src/styles/pages.style/settings.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<div class="page-content">
-        <div class="header-container">
-                <h1 class="header-title">CONFIGURACIONES</h1>
-        </div>
-            <div class="header-right-buttons">
-                <button class="button-icon-container">
-                    <i class="fas fa-search"></i>
-                </button>
-                <button class="button-icon-container">
-                    <span class="logo-text">&lt;/Riw&gt;</span>
-                </button>
-                <button class="button-icon-container">
-                    <span class="logo-text">&lt;/Riw&gt;</span><span class="logo-subtext">Talent</span>
-                </button>
+
+<div class="container settings-container">
+    <!-- Sidebar (copiado del componente para vista standalone) -->
+    <div class="sidebar">
+        <div class="user-profile">
+            <div class="user-avatar"><img src="" alt="User Avatar"></div>
+            <div class="user-info">
+                <h3></h3>
+                <p></p>
             </div>
-        <div class="main-container">
-            <div class="inner-container">
-                <button class="settings-button first-button" id="editProfileBtn">
-                    <i class="fas fa-user"></i>
-                    <div class="button-text">Perfil (Editar perfil)</div>
-                </button>
-                <button class="settings-button second-button" id="toggleNotificationsBtn">
-                    <i class="fas fa-bell"></i>
-                    <div class="button-text">Activar / Desactivar notificaciones</div>
-                </button>
-                <button class="settings-button third-button" id="changePasswordBtn">
-                    <i class="fas fa-lock"></i>
-                    <div class="button-text">Cambiar contraseña</div>
-                </button>
-                <button class="settings-button fourth-button" id="logoutBtn">
-                    <i class="fas fa-cog"></i>
-                    <div class="button-text">Cerrar sesión</div>
-                </button>
-                </div>
+        </div>
+        <nav class="nav-menu">
+            <a href="/home" class="nav-item" data-link><span class="nav-icon">🏠</span><span class="nav-text">INICIO</span></a>
+            <a href="/notifications" class="nav-item" data-link><span class="nav-icon">🔔</span><span class="nav-text">NOTIFICACIONES</span></a>
+            <a href="/profile" class="nav-item" data-link><span class="nav-icon">👤</span><span class="nav-text">PERFIL</span></a>
+            <a href="/chats" class="nav-item" data-link><span class="nav-icon">💬</span><span class="nav-text">CHATS</span></a>
+            <a href="/settings" class="nav-item active" data-link><span class="nav-icon">⚙️</span><span class="nav-text">CONFIGURACION</span></a>
+        </nav>
+        <button class="logout-btn" id="logoutBtnSide">CERRAR SESION</button>
+        <div class="riwi-logo"><img src="./src/images/logo.png" alt="Riwi Logo"></div>
+    </div>
+
+    <!-- Contenido de Settings -->
+    <div class="settings-page">
+        <div class="settings-header-bar">
+            <h1 class="header-title">CONFIGURACIONES</h1>
+            <div class="header-right-buttons">
+                <button class="button-icon-container" title="Buscar"><i class="fas fa-search"></i></button>
+                <button class="button-icon-container" title="Riwi"><span class="logo-text">&lt;/Riw&gt;</span></button>
+                <button class="button-icon-container" title="Riw Talent"><span class="logo-text">&lt;/Riw&gt;</span><span class="logo-subtext">Talent</span></button>
+            </div>
+        </div>
+        <div class="settings-card">
+            <div class="settings-actions">
+                <button class="settings-button" id="editProfileBtn"><i class="fas fa-user"></i><span class="button-text">Perfil (Editar perfil)</span></button>
+                <button class="settings-button" id="toggleNotificationsBtn"><i class="fas fa-bell"></i><span class="button-text">Activar / Desactivar notificaciones</span></button>
+                <button class="settings-button" id="changePasswordBtn"><i class="fas fa-lock"></i><span class="button-text">Cambiar contraseña</span></button>
+                <button class="settings-button" id="logoutBtn"><i class="fas fa-cog"></i><span class="button-text">Cerrar sesión</span></button>
             </div>
         </div>
     </div>
+</div>

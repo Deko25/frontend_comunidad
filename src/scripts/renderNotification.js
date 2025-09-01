@@ -7,32 +7,46 @@ export function renderNotification(notification) {
     const card = document.createElement('div');
     card.className = 'card left';
 
+    // Intentar extraer snapshot desde message si viene como JSON serializado
+    let snapshot = null;
+    if (notification.message) {
+        try { snapshot = JSON.parse(notification.message); } catch (_) {}
+    }
+
+    const derivedName = snapshot?.actorName || notification.actor_name
+        || (notification.Post?.Profile?.User ? `${notification.Post.Profile.User.first_name} ${notification.Post.Profile.User.last_name}`.trim() : '')
+        || (notification.post?.Profile?.User ? `${notification.post.Profile.User.first_name} ${notification.post.Profile.User.last_name}`.trim() : '')
+        || notification.user_name
+        || (notification.Profile?.User ? `${notification.Profile.User.first_name} ${notification.Profile.User.last_name}`.trim() : '');
+
+    const profilePhoto = snapshot?.actorPhoto || notification.actor_photo
+        || notification.Post?.Profile?.profile_photo
+        || notification.post?.Profile?.profile_photo
+        || notification.post?.profile_photo
+        || notification.Profile?.profile_photo
+        || './src/images/default-avatar.png';
+
     // Mensaje personalizado según el tipo de notificación
     let message = '';
     switch (notification.type) {
         case 'post':
-            message = `${notification.user_name} hizo una nueva publicación`;
+            message = snapshot?.display || `${derivedName} hizo una nueva publicación`;
             break;
         case 'reaction':
-            message = `${notification.user_name} reaccionó a tu publicación`;
+            message = `${derivedName} reaccionó a tu publicación`;
             break;
         case 'comment':
-            message = `${notification.user_name} comentó tu publicación`;
+            message = `${derivedName} comentó tu publicación`;
             break;
         default:
             message = notification.message || 'Tienes una nueva notificación';
     }
 
-    let profilePhoto = notification.post?.Profile?.profile_photo
-        || notification.post?.profile_photo
-        || notification.Profile?.profile_photo
-        || './src/images/default-avatar.png';
-
     card.innerHTML = `
-    <img src="${profilePhoto}" alt="${notification.user_name || 'Usuario'}" class="avatar">
+    <img src="${profilePhoto}" alt="${derivedName || 'Usuario'}" class="avatar">
         <div class="info">
             <div class="top">
-                <span class="name">${notification.user_name || ''}</span>
+                <span class="name">${derivedName}</span>
                 <div class="meta">
                     <span>${timeAgo(notification.date)}</span>
                     <span class="verified-badge">✓</span>

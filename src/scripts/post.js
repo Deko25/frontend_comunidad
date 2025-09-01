@@ -229,6 +229,44 @@ function renderPost(post, currentProfileId) {
     const reactionsDropdown = postElement.querySelector('.reactions-dropdown');
     const reactionOptions = reactionsDropdown.querySelectorAll('.reaction-option');
 
+        // Lógica de retardo para mostrar/ocultar reacciones sin que desaparezca rápido
+        let openTimeout, closeTimeout;
+        const openDelay = 120; // ms antes de abrir
+        const closeDelay = 300; // ms antes de cerrar para dar tiempo a mover el mouse
+
+        function openDropdown() {
+            clearTimeout(closeTimeout);
+            if (reactionBtnContainer.classList.contains('open')) return;
+            openTimeout = setTimeout(() => {
+                reactionBtnContainer.classList.add('open');
+            }, openDelay);
+        }
+
+        function closeDropdown() {
+            clearTimeout(openTimeout);
+            closeTimeout = setTimeout(() => {
+                reactionBtnContainer.classList.remove('open');
+            }, closeDelay);
+        }
+
+        reactionBtnContainer.addEventListener('mouseenter', openDropdown);
+        reactionBtnContainer.addEventListener('mouseleave', closeDropdown);
+        reactionsDropdown.addEventListener('mouseenter', () => {
+            clearTimeout(closeTimeout);
+        });
+        reactionsDropdown.addEventListener('mouseleave', closeDropdown);
+
+        // También abrir al hacer foco con teclado
+        const mainReactionBtn = reactionBtnContainer.querySelector('.main-reaction-btn');
+        if (mainReactionBtn) {
+            mainReactionBtn.addEventListener('focus', () => {
+                reactionBtnContainer.classList.add('open');
+            });
+            mainReactionBtn.addEventListener('blur', () => {
+                closeDropdown();
+            });
+        }
+
     reactionOptions.forEach(option => {
         option.addEventListener('click', async () => {
             const reactionType = option.dataset.reactionType;

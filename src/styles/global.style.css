@@ -659,10 +659,15 @@ body {
     border: 1px solid #e4e6ea;
 }
 
-.reaction-buttons-container:hover .reactions-dropdown {
-    display: flex;
-    animation: slideUp 0.3s ease-out forwards;
+.reaction-buttons-container.open .reactions-dropdown {
+  display: flex;
+  animation: slideUp 0.25s ease-out forwards;
+  pointer-events: auto;
 }
+
+/* Estado inicial sin hover: permitir retardo JS sin parpadeo */
+.reactions-dropdown { opacity:0; pointer-events:none; transition:opacity .18s ease; }
+.reaction-buttons-container.open .reactions-dropdown { opacity:1; }
 
 @keyframes slideUp {
     from {

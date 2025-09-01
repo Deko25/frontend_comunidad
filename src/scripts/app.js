@@ -83,11 +83,11 @@ async function navigate(pathname, addToHistory = true) {
 
     const route = routes[pathname] || routes["/"];
     try {
-        const html = await fetch(route).then(res => res.text());
+    const html = await fetch(route).then(res => res.text());
 
         document.getElementById("app").innerHTML = html;
 
-        const sidebarRoutes = ["/home", "/notifications", "/profile", "/settings", "/chats"];
+    const sidebarRoutes = ["/home", "/notifications", "/profile", "/settings", "/chats"];
         if (sidebarRoutes.includes(pathname)) {
             try {
                 const sidebarHtml = await fetch("/src/components/sidebar.html").then(res => res.text());
@@ -105,6 +105,8 @@ async function navigate(pathname, addToHistory = true) {
                     container.insertAdjacentHTML('afterbegin', sidebarHtml);
                 }
                 updateSidebar();
+        // Marcar elemento activo en el sidebar según la ruta
+        setActiveNavItem(pathname);
                 if (pathname === '/notifications') {
                     renderAllNotifications(getNotifications);
                 }
@@ -148,6 +150,20 @@ async function navigate(pathname, addToHistory = true) {
     } catch (error) {
         console.error('Error al cargar la página:', error);
     }
+}
+
+// Marca el enlace activo en el sidebar basándose en la ruta actual
+function setActiveNavItem(currentPath) {
+    const navItems = document.querySelectorAll('.sidebar .nav-menu .nav-item');
+    if (!navItems.length) return;
+    navItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href === currentPath) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
 }
 
 function runPageScripts(pathname) {
