@@ -225,3 +225,5 @@ function extractSidebar(raw) {
     return raw.slice(start); // fallback si no cerró
 }
 
+
+
