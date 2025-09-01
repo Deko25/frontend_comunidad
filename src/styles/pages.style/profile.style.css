@@ -1,137 +1,26 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+/* Estilos exclusivos de la página de perfil, aislados para no chocar con globales */
 
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: linear-gradient(135deg, #c8b5ff 0%, #b8a5ff 100%);
-    min-height: 100vh;
-    padding: 20px;
-}
-
-.container {
-    display: grid;
-    grid-template-columns: 280px 1fr 300px;
-    gap: 20px;
-    max-width: 1400px;
-    margin: 0 auto;
-    height: calc(100vh - 40px);
-}
-
-.sidebar {
-    background: white;
-    border-radius: 20px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-.user-profile {
-    display: flex;
-    align-items: center;
-    margin-bottom: 30px;
-}
-
-.user-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    overflow: hidden;
-    margin-right: 15px;
-}
-
-.user-avatar img {
-    width: 100%;
+.profile-page { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 14px; 
+    width: 100%; 
+    padding: 0 0 6px; 
     height: 100%;
-    object-fit: cover;
-}
-
-.user-info h3 {
-    font-size: 16px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 5px;
-}
-
-.user-info p {
-    font-size: 14px;
-    color: #666;
-}
-
-.nav-menu {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.nav-item {
-    display: flex;
     align-items: center;
-    padding: 15px 20px;
-    border-radius: 15px;
-    text-decoration: none;
-    color: #333;
-    font-weight: 500;
-    font-size: 14px;
-    transition: all 0.3s ease;
-}
-
-.nav-item:hover {
-    background-color: #705fff;
-    color: white;
-}
-
-.nav-item.active {
-    background-color: #705fff;
-    color: white;
-}
-
-.nav-icon {
-    margin-right: 15px;
-    font-size: 18px;
-}
-
-.logout-btn {
-    background: #705fff;
-    color: white;
-    border: none;
-    padding: 15px 20px;
-    border-radius: 15px;
-    font-weight: bold;
-    font-size: 14px;
-    cursor: pointer;
-    margin: 20px 0;
-    transition: all 0.3s ease;
-}
-
-.logout-btn:hover {
-    background: #5a4bcc;
-}
-
-.riwi-logo {
-    text-align: center;
-    margin-top: 20px;
-}
-
-.riwi-logo img {
-    max-width: 100%;
-    height: auto;
 }
 
 /*PROFILE*/
 
-.header {
+.profile-page .header {
     display: flex;
     justify-content: space-between;
-    align-items: start;
-    margin-bottom: 30px;
+    align-items: center;
+    margin-bottom: 4px;
+    gap: 35%;
 }
 
-.search-bar {
+.profile-page .search-bar {
     background: white;
     border-radius: 25px;
     padding: 12px 25px;
@@ -143,12 +32,14 @@ body {
     width: 300px;
 }
 
-.header-icons {
+.profile-page .header-icons {
     display: flex;
     gap: 15px;
+    background: white;
+    border-radius: 26px;
 }
 
-.icon-button {
+.profile-page .icon-button {
     background: white;
     border-radius: 50%;
     width: 50px;
@@ -161,39 +52,64 @@ body {
     transition: transform 0.2s;
 }
 
-.icon-button:hover {
+.profile-page .icon-button:hover {
     transform: translateY(-2px);
 }
 
-.main-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    background: #705FFF;
-    backdrop-filter: blur(10px);
-    border-radius: 25px;
-    padding: 30px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-    flex: 1;
-    height: calc(91vh - 40px);
+/* Mini grupo de iconos RIWI en header de perfil */
+.profile-page .riwi-icons-mini {
+    display: flex;
+    gap: 10px;
+    align-items: center;
 }
 
-.left-panel {
+.profile-page .riwi-icon-btn {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .5px;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-page .profile-content {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 14px;
+    background: #705FFF;
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 12px 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.14);
+    flex: 1;
+    height: auto;
+    min-height: 0;
+    align-content: start;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.profile-page .left-panel {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.reward-section {
+.profile-page .reward-section {
     background: #ffffff83;
-    border-radius: 20px;
-    padding: 20px;
+    border-radius: 14px;
+    padding: 88px 12px 129px;
     width: 100%;
-    margin-bottom: 20px;
-    height: calc(74vh - 40px);
+    margin-bottom: 10px;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.reward-title {
+.profile-page .reward-title {
     font-size: 25px;
     font-weight: bold;
     color: black;
@@ -201,7 +117,7 @@ body {
     text-align: center;
 }
 
-.progress-bar {
+.profile-page .progress-bar {
     background: linear-gradient(90deg, #00d4ff, #5b73ff, #000);
     height: 20px;
     border-radius: 10px;
@@ -211,7 +127,7 @@ body {
     justify-self: center;
 }
 
-.progress-indicator {
+.profile-page .progress-indicator {
     position: absolute;
     right: 20px;
     top: -2px;
@@ -228,16 +144,16 @@ body {
 
 
 
-.profile-image {
-    width: 280px;
-    height: 300px;
-    border-radius: 15px;
+.profile-page .profile-image {
+    width: 180px;
+    height: 195px;
+    border-radius: 12px;
     object-fit: cover;
-    margin-bottom: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    margin-bottom: 10px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
 }
 
-.clan-badge {
+.profile-page .clan-badge {
     position: absolute;
     bottom: -10px;
     right: -10px;
@@ -254,20 +170,18 @@ body {
     box-shadow: 0 5px 20px rgba(0,0,0,0.3);
 }
 
-.profile-container {
+.profile-page .profile-container {
     position: relative;
-    margin-bottom: 20px;
-    margin-top: 110px;
-    
+    margin: 6px 0 12px;
 }
 
-.action-buttons {
+.profile-page .action-buttons {
     display: flex;
     gap: 20px;
     width: 100%;
 }
 
-.btn {
+.profile-page .btn {
     flex: 1;
     padding: 15px;
     border-radius: 15px;
@@ -278,199 +192,257 @@ body {
     font-size: 16px;
 }
 
-.btn-edit {
+.profile-page .btn-edit {
     background: white;
     color: #000;
 }
 
-.btn-add {
+.profile-page .btn-add {
     background: white;
     color: #000;
 }
 
-.btn:hover {
+.profile-page .btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
-.right-panel {
+.profile-page .right-panel {
     display: flex;
     flex-direction: column;
 }
 
-.profile-name {
-    font-size: 48px;
-    font-weight: 900;
-    color: #1a202c;
-    margin-bottom: 20px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+.profile-page .profile-name {
+    font-size: clamp(26px,3.4vw,40px);
+    line-height: 1.1;
+    font-weight: 800;
+    color: #fff;
+    margin: 4px 0 12px;
+    text-shadow: 1px 2px 6px rgba(0,0,0,0.4);
+    letter-spacing: .8px;
+    width: 100%;
+    text-align: center;
+    display: block;
+        white-space: nowrap;          /* una sola línea */
+        overflow: hidden;             /* oculta exceso */
+        text-overflow: ellipsis;      /* muestra '...' */
 }
 
-.clan-flex {
+/* En pantallas pequeñas permitimos que el nombre haga wrap en varias líneas */
+@media (max-width: 600px) {
+    .profile-page .profile-name {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: unset;
+        word-break: break-word;
+    }
+}
+
+.profile-page .clan-flex {
     display: flex;
-    gap: 20px;
+    gap: 30px;
 }
 
 
-.clan-info {
+.profile-page .clan-info {
     background: #ffffff83;
-    border-radius: 15px;
-    padding: 15px;
-    margin-bottom: 20px;
-    display: inline-block;
-    width: 150px;
+    border-radius: 14px;
+    padding: 14px 12px 16px;
+    margin-bottom: 16px;
+    width: 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
-.clan-label {
-    font-size: 20px;
+.profile-page .clan-label {
+    font-size: 35px;
     color: black;
     text-align: center;
     margin-bottom: 5px;
+    font-weight: bold;
 }
 
-.clan-name {
+.profile-page .clan-name {
     font-size: 24px;
     font-weight: bold;
     color: black;
 }
 
-.badges-section {
-    margin-bottom: 30px;
-    width: 150px;
+.profile-page .badges-section {
+    margin-bottom: 16px;
+    width: 120px;
 }
 
-.badges-label {
-    font-size: 20px;
+.profile-page .badges-label {
+    font-size: 35px;
     color: black;
-    margin-bottom: 10px;
+    margin-bottom: 30px;
     text-align: center;
+    font-weight: bold;
 }
 
-.badges-grid {
+.profile-page .badges-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+    gap: 8px;
     background: #ffffff83;
-    padding: 15px;
-    border-radius: 15px;
+    padding: 10px;
+    border-radius: 12px;
+    width: 100%;
+    justify-items: center;
+    display: ruby-text;
+
+/* Ajuste de tamaño uniforme para insignias dentro del recuadro */
+.profile-page .badges-grid .badge {
+    width: 48px;
+    height: 48px;
+}
 }
 
-.badge {
-    width: 50px;
-    height: 50px;
+.profile-page .badge {
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 18px;
     color: white;
     font-weight: bold;
 }
 
-.badge-1 { background: linear-gradient(135deg, #f6e05e, #d69e2e); }
-.badge-2 { background: linear-gradient(135deg, #9f7aea, #805ad5); }
-.badge-3 { background: linear-gradient(135deg, #4299e1, #2b6cb0); }
-.badge-4 { background: linear-gradient(135deg, #48bb78, #38a169); }
+.profile-page .badge-1 { background: linear-gradient(135deg, #f6e05e, #d69e2e); }
+.profile-page .badge-2 { background: linear-gradient(135deg, #9f7aea, #805ad5); }
+.profile-page .badge-3 { background: linear-gradient(135deg, #4299e1, #2b6cb0); }
+.profile-page .badge-4 { background: linear-gradient(135deg, #48bb78, #38a169); }
 
-.description-section {
+.profile-page .description-section {
     background: #ffffff83;
-    border-radius: 15px;
-    padding: 20px;
-    margin-bottom: 30px;
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    max-height: 100%;
+    overflow: hidden;
+    flex: 1;
 }
 
-.description-title {
-    font-size: 24px;
+.profile-page .description-title {
+    font-size: 46px;
     font-weight: bold;
     color: #1a202c;
     margin-bottom: 15px;
 }
 
-.description-text {
+.profile-page .description-text {
     color: #4a5568;
     line-height: 1.6;
     font-size: 16px;
 }
 
-.notes-section {
+.profile-page .notes-section {
     background: #ffffff83;
-    border-radius: 15px;
-    padding: 20px;
+    border-radius: 12px;
+    padding: 10px 12px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;              /* ocupa el espacio restante del panel derecho */
+    min-height: 0;        /* permite que flexbox calcule bien alturas con overflow */
+    overflow: hidden;     /* recorta bordes redondeados */
 }
 
-.notes-title {
+.profile-page .notes-title {
     font-size: 24px;
     font-weight: bold;
     color: black;
     margin-bottom: 20px;
 }
 
-.notes-container {
-    display: flex;
-    gap: 15px;
+.profile-page .notes-container {
+    flex: 1;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 140px;
+    gap: 8px;
     position: relative;
+    overflow-x: auto;     /* scroll horizontal */
+    overflow-y: hidden;
+    padding: 2px 30px 6px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
 }
 
-.note {
+/* Scrollbar estilizado (WebKit) */
+.profile-page .notes-container::-webkit-scrollbar { height: 6px; }
+.profile-page .notes-container::-webkit-scrollbar-track { background: transparent; }
+.profile-page .notes-container::-webkit-scrollbar-thumb { background: #705fffaa; border-radius: 3px; }
+.profile-page .notes-container::-webkit-scrollbar-thumb:hover { background: #5d4bcc; }
+
+.profile-page .note {
     background: #fef5e7;
-    border-radius: 10px;
-    padding: 15px;
-    min-width: 150px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    padding: 8px 10px;
+    width: 140px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 110px;
+    overflow: hidden;
+    scroll-snap-align: start;
 }
 
-.note-title {
+.profile-page .note-title {
     font-weight: bold;
     margin-bottom: 8px;
     color: #1a202c;
     font-size: 14px;
 }
 
-.note-text {
-    font-size: 12px;
+.profile-page .note-text {
+    font-size: 10px;
     color: #4a5568;
-    line-height: 1.4;
+    line-height: 1.25;
+    display: -webkit-box;
+    line-clamp: 5;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-.nav-arrow {
+.profile-page .nav-arrow {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.85);
     border: none;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    font-size: 20px;
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
     cursor: pointer;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    backdrop-filter: blur(4px);
 }
 
-.nav-arrow.left {
+.profile-page .nav-arrow.left {
     left: -20px;
 }
 
-.nav-arrow.right {
+.profile-page .nav-arrow.right {
     right: -20px;
 }
 
 @media (max-width: 1200px) {
-    .container {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
-    }
-    
-    .main-content {
-        grid-template-columns: 1fr;
-    }
-    
-    .profile-name {
-        font-size: 36px;
-    }
-    
-    .notes-container {
-        flex-direction: column;
-    }
+    .profile-page .profile-content { grid-template-columns: 1fr; max-width: 520px; }
+    .profile-page .left-panel { flex-direction: row; gap: 14px; align-items: flex-start; }
+    .profile-page .reward-section { max-width: 200px; }
+    .profile-page .profile-name { font-size: 28px; }
+    .profile-page .notes-section { max-height: 140px; }
 }
 
 
