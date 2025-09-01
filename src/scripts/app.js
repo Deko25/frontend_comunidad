@@ -3,6 +3,7 @@ import { jwtDecode } from 'jwt-decode';
 import { setupLoginForm, setupRegisterForm, setupProfileForm } from './form-logic.js';
 import { checkProfileStatus, getProfileData } from '../services/profile.service.js';
 import { setupSettingsPage } from './settings.js';
+import { setupProfilePage } from './profile.page.js';
 import { setupPostPage } from './post.js';
 import { getNotifications } from '../services/notification.service.js';
 import { initNotificationSocket } from './notification.socket.js';
@@ -203,6 +204,8 @@ function runPageScripts(pathname) {
         setupProfileForm(navigate);
     } else if (pathname === '/chats') {
         import('./chats.script.js');
+    } else if (pathname === '/profile') {
+        setupProfilePage();
     } else if (pathname === '/settings') {
         setupSettingsPage(navigate); 
     }
