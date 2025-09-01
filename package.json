@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "start": "vite preview --port $PORT --host"
+    "preview": "vite preview"
   },
   "dependencies": {
     "axios": "^1.11.0",

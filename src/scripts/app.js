@@ -1,4 +1,5 @@
 import { renderNotification, timeAgo, renderAllNotifications} from './renderNotification.js';
+import sidebarRaw from '../components/sidebar.html?raw';
 import { jwtDecode } from 'jwt-decode';
 import { setupLoginForm, setupRegisterForm, setupProfileForm } from './form-logic.js';
 import { checkProfileStatus, getProfileData } from '../services/profile.service.js';
@@ -9,15 +10,15 @@ import { getNotifications } from '../services/notification.service.js';
 import { initNotificationSocket } from './notification.socket.js';
 
 const routes = {
-    "/": "/src/pages/login.page.html",
-    "/login": "/src/pages/login.page.html",
-    "/register": "/src/pages/register.page.html",
-    "/home": "/src/pages/home.page.html",
-    "/notifications": "/src/pages/notifications.page.html",
-    "/profile": "/src/pages/profile.page.html",
-    "/chats": "/src/pages/chats.page.html",
-    "/settings": "/src/pages/settings.page.html",
-    "/profile-setup": "/src/pages/profile-setup.page.html"
+    "/": "/pages/login.page.html",
+    "/login": "/pages/login.page.html",
+    "/register": "/pages/register.page.html",
+    "/home": "/pages/home.page.html",
+    "/notifications": "/pages/notifications.page.html",
+    "/profile": "/pages/profile.page.html",
+    "/chats": "/pages/chats.page.html",
+    "/settings": "/pages/settings.page.html",
+    "/profile-setup": "/pages/profile-setup.page.html"
 };
 
 const protectedRoutes = ["/home", "/notifications", "/profile", "/chats", "/settings", "/profile-setup"];
@@ -88,32 +89,14 @@ async function navigate(pathname, addToHistory = true) {
         document.getElementById("app").innerHTML = html;
 
     const sidebarRoutes = ["/home", "/notifications", "/profile", "/settings", "/chats"];
-        if (sidebarRoutes.includes(pathname)) {
-            try {
-                const sidebarHtml = await fetch("/src/components/sidebar.html").then(res => res.text());
-                const appContainer = document.getElementById("app");
-                let container = appContainer.querySelector('.container');
-                if (!container) {
-                    container = document.createElement('div');
-                    container.className = 'container';
-                    while (appContainer.firstChild) {
-                        container.appendChild(appContainer.firstChild);
-                    }
-                    appContainer.appendChild(container);
-                }
-                if (!container.querySelector('.sidebar')) {
-                    container.insertAdjacentHTML('afterbegin', sidebarHtml);
-                }
-                updateSidebar();
-        // Marcar elemento activo en el sidebar según la ruta
+    if (sidebarRoutes.includes(pathname)) {
+        injectSidebar();
+        updateSidebar();
         setActiveNavItem(pathname);
-                if (pathname === '/notifications') {
-                    renderAllNotifications(getNotifications);
-                }
-            } catch (err) {
-                console.error('Error loading sidebar:', err);
-            }
+        if (pathname === '/notifications') {
+            renderAllNotifications(getNotifications);
         }
+    }
         
 
 
@@ -202,4 +185,43 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 export { navigate }; 
+
+function injectSidebar() {
+    const appContainer = document.getElementById('app');
+    if (!appContainer) return;
+    let container = appContainer.querySelector('.container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'container';
+        while (appContainer.firstChild) {
+            container.appendChild(appContainer.firstChild);
+        }
+        appContainer.appendChild(container);
+    }
+    if (container.querySelector('.sidebar')) return; // ya insertado (p.ej. settings.page.html lo trae inline)
+    const sidebarHtml = extractSidebar(sidebarRaw);
+    if (sidebarHtml) {
+        container.insertAdjacentHTML('afterbegin', sidebarHtml);
+    } else {
+        console.warn('[SIDEBAR] No se pudo extraer el bloque .sidebar del HTML raw');
+    }
+}
+
+function extractSidebar(raw) {
+    if (!raw) return '';
+    // El archivo incluye un wrapper .container externo; recorta desde <div class="sidebar" ... hasta su cierre
+    const start = raw.indexOf('<div class="sidebar"');
+    if (start === -1) return raw; // fallback
+    // Buscar el cierre del primer nivel de sidebar: contamos aperturas/cierres de <div>
+    let depth = 0; let i = start; const len = raw.length;
+    while (i < len) {
+        if (raw.slice(i).startsWith('<div')) { depth++; i += 4; }
+        else if (raw.slice(i).startsWith('</div')) { depth--; i += 5; if (depth === 0) { // fin de sidebar
+                // incluir este cierre
+                return raw.slice(start, i + 1);
+            } }
+        else { i++; }
+    }
+    return raw.slice(start); // fallback si no cerró
+}
 
