@@ -12,7 +12,7 @@ import { initNotificationSocket } from './notification.socket.js';
 const routes = {
     "/": "/pages/login.page.html",
     "/login": "/pages/login.page.html",
-    "/register": "./pages/register.page.html",
+    "/register": "/pages/register.page.html",
     "/home": "/pages/home.page.html",
     "/notifications": "/pages/notifications.page.html",
     "/profile": "/pages/profile.page.html",
