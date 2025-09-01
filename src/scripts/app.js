@@ -28,7 +28,7 @@ async function updateSidebar() {
         const userImage = document.querySelector('.user-avatar img');
         const userName = document.querySelector('.user-info h3');
         const userEmail = document.querySelector('.user-info p');
-        const API_URL = 'http://localhost:3000/';
+    // URLs ahora centralizadas en config.js (API_BASE_URL)
 
         if (userImage && userName && userEmail) {
             userImage.src = profile.profile_photo ? profile.profile_photo : './src/images/default-avatar.png';

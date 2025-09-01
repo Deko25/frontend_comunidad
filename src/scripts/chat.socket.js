@@ -1,5 +1,7 @@
 // chat.socket.js
 // Script para manejar la lógica de chat en tiempo real
+import { SOCKET_URL } from '../config.js';
+
 let socket;
 let userId = null;
 
@@ -9,7 +11,7 @@ export async function initChatSocket(_userId, chatIds = []) {
     console.error('Socket.io client not loaded');
     return;
   }
-  socket = window.io('http://localhost:3000', {
+  socket = window.io(SOCKET_URL, {
     reconnection: true,
     reconnectionAttempts: Infinity,
     reconnectionDelay: 500,

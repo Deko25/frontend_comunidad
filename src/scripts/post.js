@@ -1,5 +1,6 @@
 import { createPost, getPosts, deletePost, updatePost, createComment, createReaction } from '../services/post.service.js';
 import { getProfileData } from '../services/profile.service.js';
+import { API_BASE_URL, buildFileUrl } from '../config.js';
 
 let currentEditingPostId = null;
 
@@ -7,7 +8,7 @@ function renderPost(post, currentProfileId) {
     const postElement = document.createElement('div');
     postElement.classList.add('post');
 
-    const API_URL = 'http://localhost:3000/';
+    const API_URL = API_BASE_URL + '/';
 
     const authorName = post.Profile && post.Profile.User
         ? `${post.Profile.User.first_name} ${post.Profile.User.last_name}`
@@ -18,13 +19,13 @@ function renderPost(post, currentProfileId) {
         : 'assets/default-user.png';
     
     let mediaContent = '';
-    if (post.image_url) {
-    mediaContent = `<img src="${post.image_url}" alt="Post Image" class="post-image">`;
-    } else if (post.code_url) {
-        mediaContent = `<pre><code class="language-javascript">...</code></pre><p>Archivo de código: <a href="${API_URL}${post.code_url}">Descargar</a></p>`;
-    } else if (post.file_url) {
-        mediaContent = `<p>Archivo adjunto: <a href="${API_URL}${post.file_url}">Descargar</a></p>`;
-    }
+        if (post.image_url) {
+            mediaContent = `<img src="${buildFileUrl(post.image_url)}" alt="Post Image" class="post-image">`;
+        } else if (post.code_url) {
+            mediaContent = `<pre><code class="language-javascript">...</code></pre><p>Archivo de código: <a href="${buildFileUrl(post.code_url)}">Descargar</a></p>`;
+        } else if (post.file_url) {
+            mediaContent = `<p>Archivo adjunto: <a href="${buildFileUrl(post.file_url)}">Descargar</a></p>`;
+        }
 
     let privacyEmoji = '';
     if (post.privacy === 'Publico') {
@@ -334,8 +335,7 @@ async function updatePostCreatorProfilePhoto() {
         const profile = await getProfileData();
         const postAvatarImg = document.querySelector('.post-creator .post-avatar');
         if (postAvatarImg && profile.profile_photo) {
-            const API_URL = 'http://localhost:3000/';
-            postAvatarImg.src = profile.profile_photo;
+            postAvatarImg.src = buildFileUrl(profile.profile_photo);
         }
     } catch (error) {
         console.error('Error al actualizar la foto de perfil del creador de posts:', error);
@@ -367,9 +367,8 @@ function setEditMode(post) {
     if (clearBtn) clearBtn.style.display = 'none';
 
     previewArea.innerHTML = '';
-    const API_URL = 'http://localhost:3000/';
     if (post.image_url) {
-        previewArea.innerHTML = `<img src="${post.image_url}" alt="Preview" class="preview-image">`;
+        previewArea.innerHTML = `<img src="${buildFileUrl(post.image_url)}" alt="Preview" class="preview-image">`;
     } else if (post.code_url) {
         previewArea.innerHTML = `<div class="preview-code"><p>Archivo de código actual: <strong>${post.code_url.split('/').pop()}</strong></p></div>`;
     } else if (post.file_url) {

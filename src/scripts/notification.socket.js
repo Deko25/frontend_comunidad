@@ -1,4 +1,5 @@
 import { getNotifications } from '../services/notification.service.js';
+import { SOCKET_URL } from '../config.js';
 
 let socket;
 
@@ -7,7 +8,7 @@ export function initNotificationSocket(profileId, onNewNotification) {
         console.error('Socket.io client not loaded');
         return;
     }
-    socket = window.io('http://localhost:3000');
+    socket = window.io(SOCKET_URL);
 
     socket.on('connect', () => {
         socket.emit('joinNotifications', { profileId });

@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { login, register } from '../services/auth.js';
 import { createProfile, getProfileData } from '../services/profile.service.js';
+import { API_BASE_URL } from '../config.js';
 
 // Nuevo servicio para obtener los roles
-const API_URL = 'http://localhost:3000';
+const API_URL = API_BASE_URL;
 
 async function getRoles() {
     try {

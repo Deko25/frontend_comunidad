@@ -1,8 +1,9 @@
 
 import { initChatSocket, sendMessage, sendTyping, joinChatRoom } from './chat.socket.js';
 import { getProfileData } from '../services/profile.service.js';
+import { API_BASE_URL } from '../config.js';
 
-const API_URL = 'http://localhost:3000/api';
+const API_URL = API_BASE_URL + '/api';
 console.log('chats.script.js ejecutándose');
 let currentUser = null;
 let selectedUser = null;

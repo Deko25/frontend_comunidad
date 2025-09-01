@@ -1,9 +1,10 @@
+import { buildFileUrl } from '../config.js';
+
 // Renderizar una notificación individual
 export function renderNotification(notification) {
     console.log('Notificación recibida:', notification);
     const container = document.querySelector('.notifications-container');
     if (!container) return;
-    const API_URL = 'http://localhost:3000/';
     const card = document.createElement('div');
     card.className = 'card left';
 
@@ -19,12 +20,13 @@ export function renderNotification(notification) {
         || notification.user_name
         || (notification.Profile?.User ? `${notification.Profile.User.first_name} ${notification.Profile.User.last_name}`.trim() : '');
 
-    const profilePhoto = snapshot?.actorPhoto || notification.actor_photo
+    const profilePhotoRaw = snapshot?.actorPhoto || notification.actor_photo
         || notification.Post?.Profile?.profile_photo
         || notification.post?.Profile?.profile_photo
         || notification.post?.profile_photo
         || notification.Profile?.profile_photo
         || './src/images/default-avatar.png';
+    const profilePhoto = buildFileUrl(profilePhotoRaw);
 
     // Mensaje personalizado según el tipo de notificación
     let message = '';
