@@ -53,6 +53,8 @@ export async function updatePost(postId, postData) {
         const response = await axios.put(`${API_URL}/posts/${postId}`, postData, {
             headers: {
                 'Authorization': `Bearer ${getToken()}`,
+                // Aseguramos multipart para backend que espera form-data
+                'Content-Type': 'multipart/form-data'
             },
         });
         return response.data;

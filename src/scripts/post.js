@@ -2,6 +2,14 @@ import { createPost, getPosts, deletePost, updatePost, createComment, createReac
 import { getProfileData } from '../services/profile.service.js';
 import { API_BASE_URL, buildFileUrl } from '../config.js';
 
+// Añade query param para evitar cache cuando se actualiza una imagen / archivo
+function cacheBust(url, updatedAt) {
+    if (!url) return url;
+    const ts = updatedAt ? new Date(updatedAt).getTime() : Date.now();
+    const sep = url.includes('?') ? '&' : '?';
+    return `${url}${sep}v=${ts}`;
+}
+
 let currentEditingPostId = null;
 
 function renderPost(post, currentProfileId) {
@@ -20,7 +28,8 @@ function renderPost(post, currentProfileId) {
     
     let mediaContent = '';
         if (post.image_url) {
-            mediaContent = `<img src="${buildFileUrl(post.image_url)}" alt="Post Image" class="post-image">`;
+            const imgUrl = cacheBust(buildFileUrl(post.image_url), post.updated_at || post.created_at);
+            mediaContent = `<img src="${imgUrl}" alt="Post Image" class="post-image">`;
         } else if (post.code_url) {
             mediaContent = `<pre><code class="language-javascript">...</code></pre><p>Archivo de código: <a href="${buildFileUrl(post.code_url)}">Descargar</a></p>`;
         } else if (post.file_url) {
@@ -368,7 +377,7 @@ function setEditMode(post) {
 
     previewArea.innerHTML = '';
     if (post.image_url) {
-        previewArea.innerHTML = `<img src="${buildFileUrl(post.image_url)}" alt="Preview" class="preview-image">`;
+        previewArea.innerHTML = `<img src="${cacheBust(buildFileUrl(post.image_url), post.updated_at || post.created_at)}" alt="Preview" class="preview-image">`;
     } else if (post.code_url) {
         previewArea.innerHTML = `<div class="preview-code"><p>Archivo de código actual: <strong>${post.code_url.split('/').pop()}</strong></p></div>`;
     } else if (post.file_url) {
@@ -419,12 +428,11 @@ export function setupPostPage() {
             formData.append('text_content', postContent);
             formData.append('privacy', privacy);
 
-            if (imageInput.files.length > 0) {
-                formData.append('postFile', imageInput.files[0]);
-            } else if (codeInput.files.length > 0) {
-                formData.append('postFile', codeInput.files[0]);
-            } else if (fileInput.files.length > 0) {
-                formData.append('postFile', fileInput.files[0]);
+            // Adjuntar archivo renombrado para evitar conflictos de cache y facilitar Cloudinary versiones
+            const fileToAppend = imageInput.files[0] || codeInput.files[0] || fileInput.files[0];
+            if (fileToAppend) {
+                const renamed = new File([fileToAppend], buildVersionedName(fileToAppend.name), { type: fileToAppend.type });
+                formData.append('postFile', renamed);
             }
 
             for (let pair of formData.entries()) {
@@ -462,4 +470,13 @@ export function setupPostPage() {
     setupFilePreview();
     updatePostCreatorProfilePhoto();
     fetchAndRenderPosts();
+}
+
+// Genera un nombre de archivo único incorporando timestamp antes de la extensión
+function buildVersionedName(originalName) {
+    const dot = originalName.lastIndexOf('.');
+    const base = dot === -1 ? originalName : originalName.slice(0, dot);
+    const ext = dot === -1 ? '' : originalName.slice(dot);
+    const ts = Date.now();
+    return `${base}_${ts}${ext}`;
 }
