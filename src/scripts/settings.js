@@ -26,11 +26,26 @@ export function setupSettingsPage(navigate) {
         });
     }
 
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            localStorage.removeItem('token'); 
-            localStorage.removeItem('profileExists');
-            navigate('/login');
-        });
-    }
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                const result = await Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: 'Se cerrará tu sesión.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#705FFF',
+                    cancelButtonColor: '#f2f3f5',
+                    confirmButtonText: 'Sí, cerrar sesión',
+                    customClass: {
+                        cancelButton: 'cancel-btn-class'
+                    }
+                });
+
+                if (result.isConfirmed) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('profileExists');
+                    navigate('/login');
+                }
+            });
+        }
 }
