@@ -5,7 +5,7 @@
 export const API_BASE_URL = (
   import.meta?.env?.VITE_API_BASE_URL ||
   (typeof window !== 'undefined' && window.__API_BASE_URL__) ||
-  'http://localhost:3000'
+  'https://backend-comunidad-uyx5.onrender.com'
 ).replace(/\/$/, ''); // quitar slash final si existe
 
 export const SOCKET_URL = (
